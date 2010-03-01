@@ -1,0 +1,74 @@
+---
+abstract: 'A more modern testing framework for perl'
+author:
+  - 'Chad Granum <exodist7@gmail.com>'
+build_requires:
+  Object::Quick: 0.012
+  Test::Builder::Tester: 0
+  Test::Exception::LessClever: 0.001
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Fennec
+no_index:
+  namespace:
+    - Test::Builder
+  package:
+    - Test::Builder
+provides:
+  Fennec:
+    file: lib/Fennec.pm
+    version: 0.005
+  Fennec::Grouping:
+    file: lib/Fennec/Grouping.pm
+  Fennec::Grouping::Base:
+    file: lib/Fennec/Grouping/Base.pm
+  Fennec::Grouping::Case:
+    file: lib/Fennec/Grouping/Case.pm
+  Fennec::Grouping::Set:
+    file: lib/Fennec/Grouping/Set.pm
+  Fennec::Manual:
+    file: lib/Fennec/Manual.pm
+  Fennec::Plugin:
+    file: lib/Fennec/Plugin.pm
+  Fennec::Plugin::Exception:
+    file: lib/Fennec/Plugin/Exception.pm
+  Fennec::Plugin::More:
+    file: lib/Fennec/Plugin/More.pm
+  Fennec::Plugin::Simple:
+    file: lib/Fennec/Plugin/Simple.pm
+  Fennec::Plugin::Warn:
+    file: lib/Fennec/Plugin/Warn.pm
+  Fennec::Specification:
+    file: lib/Fennec/Specification.pm
+  Fennec::TestBase:
+    file: lib/Fennec/TestBase.pm
+  Fennec::TestBuilderImposter:
+    file: lib/Fennec/TestBuilderImposter.pm
+  Fennec::TestHelper:
+    file: lib/Fennec/TestHelper.pm
+  Fennec::Tester:
+    file: lib/Fennec/Tester.pm
+  Test::Builder:
+    file: lib/Fennec/TestBuilderImposter.pm
+requires:
+  File::Find: 0
+  File::Temp: 0.2
+  IO: 1.2301
+  List::Util: 0
+  Scalar::Util: 0
+  Sub::Uplevel: 0.2
+  Test::Simple: 0.88
+  Test::Warn: 0
+  Time::HiRes: 0
+  Try::Tiny: 0
+  autodie: 0
+resources:
+  bugtracker: http://github.com/exodist/Fennec/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/exodist/Fennec
+version: 0.005
