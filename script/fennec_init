@@ -1,3 +1,15 @@
+#!/usr/bin/perl;
+use strict;
+use warnings;
+
+eval {
+    mkdir( 't' );
+};
+
+unless( -e 't/Fennec.t' ) {
+    open( my $fennect, '>', 't/Fennec.t' ) || die ( "Error creating test file: $!" );
+
+    print $fennect <<'EOT';
 #!/usr/bin/perl
 use strict;
 use warnings;
@@ -12,9 +24,12 @@ use Fennec::Runner;
     Collector => 'Files',
     ignore => undef,
     filetypes => [qw/ Module /],
-    default_asserts => [qw/Core Interceptor/],
+    default_asserts => [qw/Interceptor/],
     $ENV{ FENNEC_FILE } ? ( files => [ cwd() . '/' . $ENV{ FENNEC_FILE }]) : (),
     $ENV{ FENNEC_ITEM } ? ( search => $ENV{ FENNEC_ITEM }) : (),
 );
 
 Runner->start;
+EOT
+    close( $fennect );
+}
