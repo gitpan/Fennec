@@ -2,21 +2,28 @@ package Fennec::Runner;
 use strict;
 use warnings;
 
-use base 'Fennec::Base';
-use Fennec::TestFile;
-use Fennec::FileLoader;
-use Fennec::Collector;
+use Fennec::Util::Alias qw/
+    Fennec::TestFile
+    Fennec::Collector
+    Fennec::Workflow
+/;
+
 use Fennec::Util::Accessors;
-use Fennec::Workflow;
-use Fennec::Output::Result;
 use Try::Tiny;
 use Parallel::Runner;
 use Carp;
+
+use Fennec::Util::Alias qw/
+    Fennec::FileLoader
+    Fennec::Output::Result
+    Fennec::Output::Diag
+/;
+
 use List::Util qw/shuffle/;
 use Time::HiRes qw/time/;
 use Benchmark qw/timeit :hireswallclock/;
 
-Accessors qw/files p_files p_tests threader ignore random pid parent_pid collector search default_asserts/;
+Accessors qw/files p_files p_tests threader ignore random pid parent_pid collector search default_asserts default_workflows/;
 
 our $SINGLETON;
 
@@ -78,6 +85,14 @@ sub start {
                     method => sub { shift->file->load },
                     file => $file,
                 )->_build_as_root;
+
+                try {
+                    $workflow->run_sub_as_current( $_ )
+                        for Fennec::Workflow->build_hooks();
+                }
+                catch {
+                    Diag->new( "build_hook error: $_" )->write
+                };
 
                 my $testfile = $workflow->testfile;
                 return Result->skip_workflow( $testfile )

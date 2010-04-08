@@ -4,6 +4,7 @@ use warnings;
 
 use Fennec::Assert;
 use Fennec::Util::Accessors;
+
 use Fennec::Assert::Core;
 use Scalar::Util qw/blessed reftype/;
 use Carp;
@@ -41,8 +42,8 @@ sub new {
     my $in = shift;
     croak "You cannot init an instance of $in"
         unless blessed( $in );
-    return $in->class->new( @_ ) if $in->class->can( 'new' );
-    return bless( {@_}, $in->class );
+    return $in->class->new( $in, @_ ) if $in->class->can( 'new' );
+    return bless( { _keep_alive_ref_ => $in,  @_ }, $in->class );
 }
 
 sub can {

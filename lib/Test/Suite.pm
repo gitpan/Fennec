@@ -1,25 +1,18 @@
-package Fennec::Base;
+package Test::Suite;
 use strict;
 use warnings;
 
-sub import {
-    my $class = shift;
-    my $caller = caller;
-
-    my $name = $class;
-    $name =~ s/^.*::([^:]+)$/$1/;
-
-    no strict 'refs';
-    *{ $caller . '::' . $name } = sub {
-        my $alias = $class->can( 'alias' );
-        return $class unless $alias;
-
-        my @caller = caller;
-        return $class->alias( \@caller, @_ );
-    }
-}
-
 1;
+
+=pod
+
+=head1 NAME
+
+Test::Suite - Framework upon which intercompatible testing solutions can be built. (Renamed to L<Fennec>)
+
+=head1 DESCRIPTION
+
+This package has been renamed to L<Fennec> please look there instead.
 
 =head1 AUTHORS
 

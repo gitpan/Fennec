@@ -2,32 +2,41 @@ package Fennec::TestFile;
 use strict;
 use warnings;
 
-use base 'Fennec::Base';
-
 use Fennec::Util::Accessors;
 use Parallel::Runner;
-use Fennec::Runner;
 use Try::Tiny;
 use Carp;
+
+use Fennec::Util::Alias qw/
+    Fennec::Runner
+/;
 
 use Scalar::Util qw/blessed/;
 
 our $NEW;
 
-Accessors qw/ workflow threader todo skip file /;
+Accessors qw/ workflow threader todo skip file sort /;
 
 sub new {
     my $class = shift;
     my %proto = @_;
-    my ( $todo, $skip, $workflow, $file ) = @proto{qw/ todo skip workflow file /};
+    my ( $todo, $skip, $workflow, $file, $random, $sort ) = @proto{qw/ todo skip workflow file random sort /};
 
     my $self = bless(
         {
             workflow    => $workflow,
             file        => $file,
-            threader    => Parallel::Runner->new( Runner->p_tests ),
+            threader    => Parallel::Runner->new(
+                $proto{ no_fork } ? 1 : Runner->p_tests
+            ),
             skip        => $skip || undef,
             todo        => $todo || undef,
+            defined( $random ) || $sort
+                ? (
+                    random => $random || 0,
+                    sort => $sort || undef,
+                )
+                : (),
         },
         $class
     );

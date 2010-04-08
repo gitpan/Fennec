@@ -4,28 +4,60 @@ use warnings;
 
 use base 'Fennec::Base::Method';
 
-use Fennec::Runner;
+require Fennec;
+
+use Fennec::Util::Alias qw/
+    Fennec::Runner
+    Fennec::TestFile
+    Fennec::TestSet
+    Fennec::Output::Result
+    Fennec::Output::Diag
+/;
+
 use Fennec::Util::Accessors;
-use Fennec::TestFile;
-use Fennec::TestSet;
-use Fennec::Output::Result;
 use Try::Tiny;
 use Carp;
 
-use Time::HiRes qw/time/;
-use Benchmark qw/timeit :hireswallclock/;
-use Scalar::Util qw/blessed/;
-use List::Util   qw/shuffle/;
+use Time::HiRes       qw/time/;
+use Benchmark         qw/timeit :hireswallclock/;
+use Scalar::Util      qw/blessed/;
+use List::Util        qw/shuffle/;
+use Exporter::Declare qw/:extend/;
 
 Accessors qw/ parent _testsets _workflows /;
 
-sub function    {}
-sub depends     {[ 'Fennec::TestSet' ]}
-sub alias       { shift->current }
+our @BUILD_HOOKS;
+
+sub alias       { current() }
 sub has_current { 0 }
 sub current     { confess "No current worflow" }
 sub depth       { 0 }
 sub proto       {( _testsets => [], _workflows => [] )}
+sub build_hooks { @BUILD_HOOKS }
+
+export 'import' => sub {
+    my $class = shift;
+    my $caller = caller;
+    $class->export_to( $caller );
+};
+
+export build_hook => sub(&) {
+    push @BUILD_HOOKS => @_;
+};
+
+sub import {
+    my $class = shift;
+    my $caller = caller;
+    my ( $imports, $specs ) = $class->_import_args( @_ );
+
+    return 1 unless( $specs->{subclass});
+
+    $class->export_to( $caller, $specs->{prefix} || undef, @$imports );
+
+    no strict 'refs';
+    push @{ $caller . '::ISA' } => $class
+        unless grep { $_ eq $class } @{ $caller . '::ISA' };
+}
 
 sub run_tests {
     my $self = shift;
@@ -35,9 +67,9 @@ sub run_tests {
                 @sets = $self->search_filter( Runner->search, \@sets );
             }
 
-            # Even if we are searching we might have multiple tests, randomize
-            # them.
             @sets = shuffle @sets if $self->testfile->random;
+            @sets = sort { $a->name cmp $b->name } @sets
+                if $self->testfile->sort;
 
             my $benchmark = timeit( 1, sub {
                 for my $set ( @sets ) {
@@ -57,9 +89,14 @@ sub run_tests {
 sub search_filter {
     my $self = shift;
     my ( $filter, $tests ) = @_;
-    return $self->filter_by_line_number( $filter, $tests )
-        if $filter =~ m/^\d+$/;
-    return $self->filter_by_name( $filter, $tests );
+    my @out;
+    if ( $filter =~ m/^\d+$/ ) {
+        @out = $self->filter_by_line_number( $filter, $tests )
+    }
+    else {
+        @out = $self->filter_by_name( $filter, $tests );
+    }
+    return @out;
 }
 
 sub filter_by_line_number {
@@ -67,12 +104,25 @@ sub filter_by_line_number {
     my ( $filter, $tests ) = @_;
     my %map;
     for my $item ( @$tests ) {
-        push @{ $map{ $item->line }} => $item;
+        my %seen;
+        my @lines = grep { !$seen{$_}++ } $item->lines_for_filter;
+        push @{ $map{$_}} => $item for @lines;
     }
-    # First number at or after.
-    my ($correct) = grep { $_ >= $filter } sort keys %map;
-    return unless $correct;
-    return @{ $map{ $correct }};
+
+    # 'B' returns the first line that has a statement within in the sub:
+    # 1: sub x {
+    # 2:  print 'x';
+    # 3: }
+    # B would give us line '2', so we shift everything up a line unless there
+    # is already something for that line.
+    for my $line ( keys %map ) {
+        $map{($line - 1)} = delete $map{$line}
+            unless $map{($line - 1)}
+    }
+
+    my ($idx) = grep { $_ <= $filter } sort { $b <=> $a } keys %map;
+    return unless $idx;
+    return @{ $map{ $idx }};
 }
 
 sub filter_by_name {
@@ -95,6 +145,7 @@ sub workflows {
 
 sub add_item {
     my $self = shift;
+    confess 'xxx' unless blessed( $self );
     my ( $item ) = @_;
     my $type = blessed( $item );
     croak( "Item must be a blessed Workflow or Testset object" )
@@ -127,7 +178,11 @@ sub build {
 sub _build_as_root {
     my $self = shift;
     my $tclass = $self->run_method_as_current( $self->method );
-    $self->parent( $tclass->new( workflow => $self, file => $self->file  ));
+    $self->parent( $tclass->new(
+        Fennec->test_class_args,
+        workflow => $self,
+        file => $self->file,
+    ));
     return $self;
 }
 
@@ -179,6 +234,7 @@ sub run_method_as_current {
 
 sub run_method_as_current_on {
     my $self = shift;
+    croak( 'xxx' ) unless blessed( $self );
     my ( $method, $obj, @args ) = @_;
     my $depth = $self->depth + 1;
 
@@ -191,6 +247,7 @@ sub run_method_as_current_on {
 
 sub run_sub_as_current {
     my $self = shift;
+    croak( 'xxx' ) unless blessed( $self );
     my ( $sub, @args ) = @_;
     my $depth = $self->depth + 1;
 

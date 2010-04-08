@@ -14,7 +14,6 @@ lib/Fennec/Assert/TBCore/Exception.pm
 lib/Fennec/Assert/TBCore/More.pm
 lib/Fennec/Assert/TBCore/Simple.pm
 lib/Fennec/Assert/TBCore/Warn.pm
-lib/Fennec/Base.pm
 lib/Fennec/Base/.keep
 lib/Fennec/Base/Method.pm
 lib/Fennec/Collector.pm
@@ -36,16 +35,18 @@ lib/Fennec/Output/Result.pm
 lib/Fennec/Runner.pm
 lib/Fennec/Runner/.keep
 lib/Fennec/TestFile.pm
-lib/Fennec/TestFile/.keep
-lib/Fennec/TestFile/Functions.pm
 lib/Fennec/TestSet.pm
+lib/Fennec/TestSet/SubSet.pm
+lib/Fennec/TestSet/SubSet/Setup.pm
 lib/Fennec/Util.pm
 lib/Fennec/Util/.keep
 lib/Fennec/Util/Abstract.pm
 lib/Fennec/Util/Accessors.pm
+lib/Fennec/Util/Alias.pm
 lib/Fennec/Workflow.pm
 lib/Fennec/Workflow/.keep
 lib/Fennec/Workflow/Methods.pm
+lib/Test/Suite.pm
 MANIFEST			This list of files
 META.yml
 README
@@ -60,5 +61,6 @@ t/Fennec.t
 t/Fennec/Assert.pm
 t/Fennec/Assert/Core.pm
 t/Fennec/Assert/Core/Simple.pm
+t/Fennec/Workflow/Methods.pm
 t/Standalone-core.t
 t/Standalone.t

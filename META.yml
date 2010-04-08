@@ -4,7 +4,7 @@ author:
   - 'Chad Granum <exodist7@gmail.com>'
 configure_requires:
   Module::Build: 0.36
-generated_by: 'Module::Build version 0.3603'
+generated_by: 'Module::Build version 0.3605'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,7 +18,7 @@ no_index:
 provides:
   Fennec:
     file: lib/Fennec.pm
-    version: 0.010
+    version: 0.012
   Fennec::Assert:
     file: lib/Fennec/Assert.pm
   Fennec::Assert::Core:
@@ -45,8 +45,6 @@ provides:
     file: lib/Fennec/Assert/TBCore/Simple.pm
   Fennec::Assert::TBCore::Warn:
     file: lib/Fennec/Assert/TBCore/Warn.pm
-  Fennec::Base:
-    file: lib/Fennec/Base.pm
   Fennec::Base::Method:
     file: lib/Fennec/Base/Method.pm
   Fennec::Collector:
@@ -67,6 +65,10 @@ provides:
     file: lib/Fennec/Handler/TAP.pm
   Fennec::Manual::Mission:
     file: lib/Fennec/Manual/Mission.pm
+  Fennec::Manual::Quickstart:
+    file: lib/Fennec/Manual/Quickstart.pm
+  Fennec::Manual::TestSuite:
+    file: lib/Fennec/Manual/TestSuite.pm
   Fennec::Output:
     file: lib/Fennec/Output.pm
   Fennec::Output::Diag:
@@ -77,24 +79,31 @@ provides:
     file: lib/Fennec/Runner.pm
   Fennec::TestFile:
     file: lib/Fennec/TestFile.pm
-  Fennec::TestFile::Functions:
-    file: lib/Fennec/TestFile/Functions.pm
   Fennec::TestSet:
     file: lib/Fennec/TestSet.pm
+  Fennec::TestSet::SubSet:
+    file: lib/Fennec/TestSet/SubSet.pm
+  Fennec::TestSet::SubSet::Setup:
+    file: lib/Fennec/TestSet/SubSet/Setup.pm
   Fennec::Util:
     file: lib/Fennec/Util.pm
   Fennec::Util::Abstract:
     file: lib/Fennec/Util/Abstract.pm
   Fennec::Util::Accessors:
     file: lib/Fennec/Util/Accessors.pm
+  Fennec::Util::Alias:
+    file: lib/Fennec/Util/Alias.pm
   Fennec::Workflow:
     file: lib/Fennec/Workflow.pm
   Fennec::Workflow::Methods:
     file: lib/Fennec/Workflow/Methods.pm
+  Test::Suite:
+    file: lib/Test/Suite.pm
 requires:
   Benchmark: 0
   Cwd: 0
   Data::Dumper: 0
+  Exporter::Declare: 0.003
   List::MoreUtils: 0
   List::Util: 0
   Parallel::Runner: 0.003
@@ -105,4 +114,4 @@ resources:
   bugtracker: http://github.com/exodist/Fennec/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/exodist/Fennec
-version: 0.010
+version: 0.012

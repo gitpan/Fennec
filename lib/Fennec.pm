@@ -3,15 +3,18 @@ use strict;
 use warnings;
 
 use Carp;
-use Fennec::Runner;
-use Fennec::TestFile;
-use Fennec::TestFile::Functions;
+use Fennec::Util::Alias qw/
+    Fennec::Runner
+    Fennec::TestFile
+/;
 
-our $VERSION = "0.010";
+our $VERSION = "0.012";
 our $TEST_CLASS;
+our @TEST_CLASS_ARGS;
 
 sub clear_test_class { $TEST_CLASS = undef }
 sub test_class { $TEST_CLASS }
+sub test_class_args { @TEST_CLASS_ARGS }
 
 sub import {
     my $class = shift;
@@ -36,14 +39,18 @@ sub import {
         if $caller eq 'main';
 
     $TEST_CLASS = $caller;
+    @TEST_CLASS_ARGS = @_;
 
     {
         no strict 'refs';
         push @{ $caller . '::ISA' } => TestFile;
     }
 
-    my $functions = Functions->new( $workflows );
-    $functions->export_to( $caller );
+    export_package_to( 'Fennec::TestSet', $caller );
+
+    $workflows ||= Runner->default_workflows || [];
+    export_package_to( 'Fennec::Workflow::' . $_, $caller )
+        for @$workflows;
 
     $asserts ||= Runner->default_asserts || [ qw/ Core / ];
     export_package_to( 'Fennec::Assert::' . $_, $caller )
@@ -74,6 +81,11 @@ L<Test::Exception>), Custom output handlers (Alternatives to TAP), Custom file
 types, and custom result passing (collectors). In L<Fennec> all test files are
 objects. L<Fennec> also solves the forking problem, thats it, forking just
 plain works.
+
+=head1 EARLY VERSION WARNING
+
+L<Fennec> is still under active development, many features are untested or even
+unimplemented. Please give it a try and report any bugs or suggestions.
 
 =head1 DOCUMENTATION
 
