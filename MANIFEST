@@ -19,6 +19,7 @@ lib/Fennec/Base/Method.pm
 lib/Fennec/Collector.pm
 lib/Fennec/Collector/Files.pm
 lib/Fennec/Collector/Interceptor.pm
+lib/Fennec/Debug.pm
 lib/Fennec/FileLoader.pm
 lib/Fennec/FileLoader/Module.pm
 lib/Fennec/FileLoader/Standalone.pm
@@ -26,9 +27,18 @@ lib/Fennec/Handler.pm
 lib/Fennec/Handler/.keep
 lib/Fennec/Handler/TAP.pm
 lib/Fennec/Manual.pm
+lib/Fennec/Manual/Assertions.pm
+lib/Fennec/Manual/Collectors.pm
+lib/Fennec/Manual/CommandLine.pm
+lib/Fennec/Manual/Files.pm
+lib/Fennec/Manual/Handlers.pm
 lib/Fennec/Manual/Mission.pm
 lib/Fennec/Manual/Quickstart.pm
+lib/Fennec/Manual/Running.pm
+lib/Fennec/Manual/TBAssertions.pm
 lib/Fennec/Manual/TestSuite.pm
+lib/Fennec/Manual/Vim.pm
+lib/Fennec/Manual/Workflows.pm
 lib/Fennec/Output.pm
 lib/Fennec/Output/Diag.pm
 lib/Fennec/Output/Result.pm
@@ -45,7 +55,9 @@ lib/Fennec/Util/Accessors.pm
 lib/Fennec/Util/Alias.pm
 lib/Fennec/Workflow.pm
 lib/Fennec/Workflow/.keep
+lib/Fennec/Workflow/Case.pm
 lib/Fennec/Workflow/Methods.pm
+lib/Fennec/Workflow/Spec.pm
 lib/Test/Suite.pm
 MANIFEST			This list of files
 META.yml
@@ -60,7 +72,12 @@ t/Fennec.pm
 t/Fennec.t
 t/Fennec/Assert.pm
 t/Fennec/Assert/Core.pm
+t/Fennec/Assert/Core/Exception.pm
+t/Fennec/Assert/Core/More.pm
 t/Fennec/Assert/Core/Simple.pm
+t/Fennec/Assert/Core/Warn.pm
+t/Fennec/Workflow/Case.pm
 t/Fennec/Workflow/Methods.pm
+t/Fennec/Workflow/Spec.pm
 t/Standalone-core.t
 t/Standalone.t

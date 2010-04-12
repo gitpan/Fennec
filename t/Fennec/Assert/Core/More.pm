@@ -1,12 +1,46 @@
-package Fennec::Assert::Core::More;
+package TEST::Fennec::Assert::Core::More;
 use strict;
 use warnings;
 
-use Fennec::Assert;
-use Fennec::Output::Result;
-use Scalar::Util qw/blessed reftype/;
-use Carp;
-our $DIFF;
+use Fennec workflows => [qw/Case Spec/];
+use Fennec::Util::Accessors;
+
+Accessors qw/ sd /;
+
+our $CLASS = 'Fennec::Assert::Core::More';
+eval "require $CLASS; 1" || die ( $@ );
+
+cases 'String::Diff' => sub {
+    my $self = shift;
+    my $sd = eval 'require String::Diff; 1';
+
+    case no_string_diff => sub {
+        $self->sd( 0 );
+        $Fennec::Assert::Core::More::DIFF = 0;
+    };
+
+    case string_diff => sub {
+        $self->sd( 1 );
+        $Fennec::Assert::Core::More::DIFF = 1;
+    } if $sd;
+
+    tests SCALAR_compare => sub {
+
+    };
+};
+
+describe 'Primary tests' => sub {
+    my $self = shift;
+    before_each {
+        $self->sd( 0 );
+        $Fennec::Assert::Core::More::DIFF = 0;
+    };
+};
+
+1;
+
+__END__
+
 BEGIN { $DIFF = eval 'require String::Diff; 1' ? 1 : 0 }
 
 tester( $_ ) for qw/is isnt like unlike can_ok isa_ok is_deeply advanced_is/;

@@ -19,10 +19,14 @@ sub cull {
     for my $file ( readdir( $handle )) {
         next if -d $file;
         next if $file =~ m/^\.+$/;
+        next unless $file =~ m/\.res$/;
         next if $BADFILES{ $file };
         my ($obj) = $self->read_and_unlink( $file );
         unless( $obj ) {
-            warn "Error procesing file: $file\n";
+            require Fennec::Debug;
+            Fennec::Debug->debug( "Error processing file: $file" );
+            $_->fennec_error( "Error processing file: $file" )
+                for @{ $self->handlers };
             next;
         }
         $_->handle( $obj ) for @{ $self->handlers };
@@ -51,30 +55,33 @@ sub finish {
 }
 
 sub read_and_unlink {
-    my $class = shift;
+    my $self = shift;
     my @out;
     for my $file ( @_ ) {
         next if $BADFILES{ $file };
-        if( my $obj = $class->read( $file )) {
+        if( my $obj = $self->read( $file )) {
             push @out => $obj;
-            unlink( $class->testdir . "/$file" );
+            unlink( $self->testdir . "/$file" );
         }
     }
     return @out;
 }
 
 sub read {
-    my $class = shift;
+    my $self = shift;
     my ( $file ) = @_;
-    my $obj = do( $class->testdir . "/$file" );
+    my $obj = do( $self->testdir . "/$file" );
     if ( $obj ) {
         my $bless = $obj->{ bless };
         my $data = $obj->{ data };
         eval "require $bless" || die( $@ );
         return bless( $data, $bless );
     }
-    warn( "bad file: '$file' - $! - $@" );
+    require Fennec::Debug;
+    Fennec::Debug->debug( "bad file: '$file' - $! - $@" );
     $BADFILES{$file} = [ $!, $@ ];
+    $_->fennec_error( "bad file: '$file' - $! - $@" )
+        for @{ $self->handlers };
     return;
 }
 
@@ -82,10 +89,13 @@ sub write {
     my $self = shift;
     my ( $output ) = @_;
     my $out = $output->serialize;
-    my $file = $self->testdir . "/$$-" . $SEMI_UNIQ++ . '.res';
+    my $file = $self->testdir . "/$$-" . $SEMI_UNIQ++;
     open( my $HANDLE, '>', $file ) || warn "Error writing output:\n\t$file\n\t$!";
     print $HANDLE Dumper( $out ) || warn "Error writing output";
     close( $HANDLE ) || die( $! );
+    # Rename file to .res after creation, that way collector does not cull it
+    # until it is finished writing.
+    rename ( $file, "$file.res" );
 }
 
 sub testdir { Fennec::FileLoader->root . "/_test" }

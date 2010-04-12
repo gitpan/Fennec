@@ -3,12 +3,13 @@ use strict;
 use warnings;
 
 use Carp;
+
 use Fennec::Util::Alias qw/
     Fennec::Runner
     Fennec::TestFile
 /;
 
-our $VERSION = "0.012";
+our $VERSION = "0.013";
 our $TEST_CLASS;
 our @TEST_CLASS_ARGS;
 
@@ -61,7 +62,7 @@ sub import {
 
 sub export_package_to {
     my ( $from, $to ) = @_;
-    eval "require $from; 1" || die( $@ );
+    die( $@ ) unless eval "require $from; 1";
     $from->export_to( $to );
 }
 
@@ -86,6 +87,38 @@ plain works.
 
 L<Fennec> is still under active development, many features are untested or even
 unimplemented. Please give it a try and report any bugs or suggestions.
+
+=head1 FEATURES
+
+Fennec offers the following features, among others.
+
+=over 4
+
+=item Large library of core test functions
+
+=item Plays nicely with L<Test::Builder> tools
+
+=item Better diagnostics
+
+=item Highly Extendable
+
+=item Lite benchmarking for free
+
+=item Works with prove
+
+=item Full-Suite management
+
+=item Standalone test support
+
+=item Support for SPEC and other test workflows
+
+=item Forking works
+
+=item Run only specific test sets within test files (for development)
+
+=item Intercept or hook into most steps or components by design
+
+=back
 
 =head1 DOCUMENTATION
 

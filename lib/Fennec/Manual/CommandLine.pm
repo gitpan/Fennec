@@ -1,26 +1,19 @@
-package Fennec::Handler;
+package Fennec::Manual::CommandLine;
 use strict;
 use warnings;
 
-sub new {
-    my $class = shift;
-    my %proto = @_;
-    my $self = bless( \%proto, $class );
-    $self->init if $self->can( 'init' );
-    return $self;
-}
-
-sub handle {
-    my $class = shift;
-    die( "$class does not implement result()" );
-}
-
-sub finish {1}
-sub start {1}
-sub bail_out {1}
-sub fennec_error {1}
-
 1;
+
+__END__
+
+=head1 NAME
+
+Fennec::Manual::CommandLine - Fennec Command Line Tools.
+
+=head1 EARLY VERSION WARNING
+
+L<Fennec> is still under active development, many features are untested or even
+unimplemented. Please give it a try and report any bugs or suggestions.
 
 =head1 AUTHORS
 

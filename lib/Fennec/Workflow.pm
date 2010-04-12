@@ -45,6 +45,8 @@ export build_hook => sub(&) {
     push @BUILD_HOOKS => @_;
 };
 
+export export => sub { goto &export };
+
 sub import {
     my $class = shift;
     my $caller = caller;
@@ -74,6 +76,7 @@ sub run_tests {
             my $benchmark = timeit( 1, sub {
                 for my $set ( @sets ) {
                     $self->testfile->threader->run(sub {
+                        Runner->reset_benchmark;
                         $set->run()
                     });
                 }
