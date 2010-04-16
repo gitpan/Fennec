@@ -18,7 +18,7 @@ no_index:
 provides:
   Fennec:
     file: lib/Fennec.pm
-    version: 0.013
+    version: 0.014
   Fennec::Assert:
     file: lib/Fennec/Assert.pm
   Fennec::Assert::Core:
@@ -29,6 +29,8 @@ provides:
     file: lib/Fennec/Assert/Core/Exception.pm
   Fennec::Assert::Core::More:
     file: lib/Fennec/Assert/Core/More.pm
+  Fennec::Assert::Core::Package:
+    file: lib/Fennec/Assert/Core/Package.pm
   Fennec::Assert::Core::Simple:
     file: lib/Fennec/Assert/Core/Simple.pm
   Fennec::Assert::Core::Warn:
@@ -85,6 +87,8 @@ provides:
     file: lib/Fennec/Manual/Running.pm
   Fennec::Manual::TBAssertions:
     file: lib/Fennec/Manual/TBAssertions.pm
+  Fennec::Manual::TODO:
+    file: lib/Fennec/Manual/TODO.pm
   Fennec::Manual::TestSuite:
     file: lib/Fennec/Manual/TestSuite.pm
   Fennec::Manual::Vim:
@@ -101,6 +105,8 @@ provides:
     file: lib/Fennec/Runner.pm
   Fennec::TestFile:
     file: lib/Fennec/TestFile.pm
+  Fennec::TestFile::Meta:
+    file: lib/Fennec/TestFile/Meta.pm
   Fennec::TestSet:
     file: lib/Fennec/TestSet.pm
   Fennec::TestSet::SubSet:
@@ -132,7 +138,7 @@ requires:
   Exporter::Declare: 0.003
   List::MoreUtils: 0
   List::Util: 0
-  Parallel::Runner: 0.003
+  Parallel::Runner: 0.004
   Scalar::Util: 0
   Time::HiRes: 0
   Try::Tiny: 0
@@ -140,4 +146,4 @@ resources:
   bugtracker: http://github.com/exodist/Fennec/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/exodist/Fennec
-version: 0.013
+version: 0.014

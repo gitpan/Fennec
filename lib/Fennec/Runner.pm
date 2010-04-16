@@ -56,6 +56,7 @@ sub init {
 
     $proto{ p_files } = 2 unless defined $proto{ p_files };
     $proto{ p_tests } = 2 unless defined $proto{ p_tests };
+    $proto{ cull_delay } = 0.1 unless $proto{ cull_delay };
 
     $SINGLETON = bless(
         {
@@ -69,6 +70,7 @@ sub init {
         },
         $class
     );
+    $SINGLETON->threader->iteration_delay( $proto{ cull_delay });
 }
 
 sub start {
@@ -96,7 +98,7 @@ sub start {
 
                 my $testfile = $workflow->testfile;
                 return Result->skip_workflow( $testfile )
-                    if $testfile->skip;
+                    if $testfile->fennec_meta->skip;
 
                 try {
                     $workflow->build_children;
@@ -105,7 +107,7 @@ sub start {
                     });
                 }
                 catch {
-                    $testfile->threader->finish;
+                    $testfile->fennec_meta->threader->finish;
                     Result->fail_workflow( $testfile, $_ );
                 };
             }

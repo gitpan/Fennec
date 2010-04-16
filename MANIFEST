@@ -6,6 +6,7 @@ lib/Fennec/Assert/Core.pm
 lib/Fennec/Assert/Core/Anonclass.pm
 lib/Fennec/Assert/Core/Exception.pm
 lib/Fennec/Assert/Core/More.pm
+lib/Fennec/Assert/Core/Package.pm
 lib/Fennec/Assert/Core/Simple.pm
 lib/Fennec/Assert/Core/Warn.pm
 lib/Fennec/Assert/Interceptor.pm
@@ -37,6 +38,7 @@ lib/Fennec/Manual/Quickstart.pm
 lib/Fennec/Manual/Running.pm
 lib/Fennec/Manual/TBAssertions.pm
 lib/Fennec/Manual/TestSuite.pm
+lib/Fennec/Manual/TODO.pm
 lib/Fennec/Manual/Vim.pm
 lib/Fennec/Manual/Workflows.pm
 lib/Fennec/Output.pm
@@ -45,6 +47,7 @@ lib/Fennec/Output/Result.pm
 lib/Fennec/Runner.pm
 lib/Fennec/Runner/.keep
 lib/Fennec/TestFile.pm
+lib/Fennec/TestFile/Meta.pm
 lib/Fennec/TestSet.pm
 lib/Fennec/TestSet/SubSet.pm
 lib/Fennec/TestSet/SubSet/Setup.pm
