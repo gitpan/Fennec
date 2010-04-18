@@ -18,7 +18,7 @@ no_index:
 provides:
   Fennec:
     file: lib/Fennec.pm
-    version: 0.015
+    version: 0.016
   Fennec::Assert:
     file: lib/Fennec/Assert.pm
   Fennec::Assert::Core:
@@ -67,34 +67,6 @@ provides:
     file: lib/Fennec/Handler.pm
   Fennec::Handler::TAP:
     file: lib/Fennec/Handler/TAP.pm
-  Fennec::Manual:
-    file: lib/Fennec/Manual.pm
-  Fennec::Manual::Assertions:
-    file: lib/Fennec/Manual/Assertions.pm
-  Fennec::Manual::Collectors:
-    file: lib/Fennec/Manual/Collectors.pm
-  Fennec::Manual::CommandLine:
-    file: lib/Fennec/Manual/CommandLine.pm
-  Fennec::Manual::Files:
-    file: lib/Fennec/Manual/Files.pm
-  Fennec::Manual::Handlers:
-    file: lib/Fennec/Manual/Handlers.pm
-  Fennec::Manual::Mission:
-    file: lib/Fennec/Manual/Mission.pm
-  Fennec::Manual::Quickstart:
-    file: lib/Fennec/Manual/Quickstart.pm
-  Fennec::Manual::Running:
-    file: lib/Fennec/Manual/Running.pm
-  Fennec::Manual::TBAssertions:
-    file: lib/Fennec/Manual/TBAssertions.pm
-  Fennec::Manual::TODO:
-    file: lib/Fennec/Manual/TODO.pm
-  Fennec::Manual::TestSuite:
-    file: lib/Fennec/Manual/TestSuite.pm
-  Fennec::Manual::Vim:
-    file: lib/Fennec/Manual/Vim.pm
-  Fennec::Manual::Workflows:
-    file: lib/Fennec/Manual/Workflows.pm
   Fennec::Output:
     file: lib/Fennec/Output.pm
   Fennec::Output::Diag:
@@ -146,4 +118,4 @@ resources:
   bugtracker: http://github.com/exodist/Fennec/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/exodist/Fennec
-version: 0.015
+version: 0.016
