@@ -29,6 +29,7 @@ sub new {
             setups => [],
             teardowns => [],
             tests => [],
+            created_in => $$,
             @_,
         },
         $class
@@ -43,7 +44,7 @@ sub lines_for_filter {
 
 sub run {
     my $self = shift;
-    return Result->skip_testset( $self, $self->skip )
+    return Result->skiparallel_testset( $self, $self->skip )
         if $self->skip;
 
     $self->run_setups;
@@ -110,6 +111,15 @@ sub run_teardowns {
     my $self = shift;
     return unless my $teardowns = $self->teardowns;
     $_->run for reverse @$teardowns;
+}
+
+sub observed {
+    my $self = shift;
+    my ( $val ) = @_;
+    return $self->SUPER::observed unless $val;
+
+    $self->SUPER::observed( $val );
+    $_->observed( $val ) for @{ $self->tests };
 }
 
 1;

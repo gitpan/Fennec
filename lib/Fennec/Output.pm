@@ -6,20 +6,18 @@ use Fennec::Util::Accessors;
 use Fennec::Util::Abstract;
 use Fennec::Util::Alias qw/
     Fennec::Runner
+    Fennec::Util
 /;
 
 Accessors qw/ stdout stderr _workflow testset timestamp /;
 
 sub workflow_stack {
     my $self = shift;
-    unless ( $self->{ workflow_stack }) {
-        my $current = $self->workflow;
-        return undef unless $current;
-        my @out = ( $current->name );
-        while (( $current = $current->parent ) && $current->isa( 'Fennec::Workflow' )) {
-            push @out => $current->name;
-        }
-        $self->{ workflow_stack } = [ reverse @out ];
+
+    unless ( exists $self->{ workflow_stack }) {
+        my @stack = Util->workflow_stack( $self->workflow );
+        return unless @stack;
+        $self->{ workflow_stack } = \@stack;
     }
     return $self->{ workflow_stack };
 }
@@ -65,3 +63,17 @@ sub workflow {
 }
 
 1;
+
+=head1 AUTHORS
+
+Chad Granum L<exodist7@gmail.com>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2010 Chad Granum
+
+Fennec is free software; Standard perl licence.
+
+Fennec is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the license for more details.

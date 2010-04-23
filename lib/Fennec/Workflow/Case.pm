@@ -20,17 +20,8 @@ sub init {
     $self->$_([]) for qw/ cases /;
 }
 
-export cases => sub {
-    Fennec::Workflow->current->add_item(
-        __PACKAGE__->new( @_ )
-    );
-};
-
-export case => sub {
-    Fennec::Workflow->current->add_item(
-        Setup->new( @_ )
-    );
-};
+build_with 'cases';
+build_with( 'case', Setup );
 
 sub testsets {
     my $self = shift;
@@ -71,3 +62,17 @@ sub add_item {
 }
 
 1;
+
+=head1 AUTHORS
+
+Chad Granum L<exodist7@gmail.com>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2010 Chad Granum
+
+Fennec is free software; Standard perl licence.
+
+Fennec is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the license for more details.

@@ -18,7 +18,7 @@ no_index:
 provides:
   Fennec:
     file: lib/Fennec.pm
-    version: 0.016
+    version: 0.017
   Fennec::Assert:
     file: lib/Fennec/Assert.pm
   Fennec::Assert::Core:
@@ -55,14 +55,14 @@ provides:
     file: lib/Fennec/Collector/Files.pm
   Fennec::Collector::Interceptor:
     file: lib/Fennec/Collector/Interceptor.pm
+  Fennec::Config:
+    file: lib/Fennec/Config.pm
   Fennec::Debug:
     file: lib/Fennec/Debug.pm
   Fennec::FileLoader:
     file: lib/Fennec/FileLoader.pm
   Fennec::FileLoader::Module:
     file: lib/Fennec/FileLoader/Module.pm
-  Fennec::FileLoader::Standalone:
-    file: lib/Fennec/FileLoader/Standalone.pm
   Fennec::Handler:
     file: lib/Fennec/Handler.pm
   Fennec::Handler::TAP:
@@ -75,6 +75,10 @@ provides:
     file: lib/Fennec/Output/Result.pm
   Fennec::Runner:
     file: lib/Fennec/Runner.pm
+  Fennec::Runner::Proto:
+    file: lib/Fennec/Runner/Proto.pm
+  Fennec::Standalone:
+    file: lib/Fennec/Standalone.pm
   Fennec::TestFile:
     file: lib/Fennec/TestFile.pm
   Fennec::TestFile::Meta:
@@ -107,7 +111,9 @@ requires:
   Benchmark: 0
   Cwd: 0
   Data::Dumper: 0
+  Digest::MD5: 0
   Exporter::Declare: 0.003
+  File::Temp: 0
   List::MoreUtils: 0
   List::Util: 0
   Parallel::Runner: 0.004
@@ -118,4 +124,4 @@ resources:
   bugtracker: http://github.com/exodist/Fennec/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/exodist/Fennec
-version: 0.016
+version: 0.017

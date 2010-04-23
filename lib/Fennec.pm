@@ -9,7 +9,7 @@ use Fennec::Util::Alias qw/
     Fennec::TestFile
 /;
 
-our $VERSION = "0.016";
+our $VERSION = "0.017";
 our $TEST_CLASS;
 our @TEST_CLASS_ARGS;
 
@@ -20,19 +20,9 @@ sub _test_class_args { @TEST_CLASS_ARGS }
 sub import {
     my $class = shift;
     my %proto = @_;
-    my ( $caller, $file, $line ) = caller;
+    my ( $caller, $file, $line ) = $proto{ caller } ? (@{$proto{ caller }}) : caller;
     my ( $workflows, $asserts ) = @proto{qw/ workflows asserts /};
     my $standalone = delete $proto{ standalone };
-
-    if ( $standalone ) {
-        'Fennec::Runner'->init(
-            %$standalone,
-            files => [ [ $caller, $file, $line ] ],
-            filetypes => [ 'Standalone' ]
-        );
-        no strict 'refs';
-        *{ $caller . '::start' } = sub { Runner->start };
-    }
 
     croak "Test runner not found"
         unless Runner;
@@ -56,6 +46,10 @@ sub import {
     $asserts ||= Runner->default_asserts || [ qw/ Core / ];
     _export_package_to( 'Fennec::Assert::' . $_, $caller )
         for @$asserts;
+
+    no strict 'refs';
+    no warnings 'redefine';
+    *{ $caller . '::finish' } = sub { carp "calling finish() is only required for Fennec::Standalone tests" };
 
     1;
 }
@@ -93,6 +87,16 @@ unimplemented. Please give it a try and report any bugs or suggestions.
 Fennec offers the following features, among others.
 
 =over 4
+
+=item No large dependancy chains
+
+=item No method attributes
+
+=item No use of END blocks
+
+=item No Devel::Declare magic
+
+=item No source filters
 
 =item Large library of core test functions
 

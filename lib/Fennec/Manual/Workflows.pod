@@ -9,31 +9,41 @@ Fennec::Manual::Workflows - Writing custom workflow plugins for Fennec.
 L<Fennec> is still under active development, many features are untested or even
 unimplemented. Please give it a try and report any bugs or suggestions.
 
+=head1 WHY WRITE A WORKFLOW
+
+In fennec a workflow is a way to structure tests. There are many popular
+testing frameworks that owe their popularity to how they structure their tests.
+A notable example is Ruby's RSPEC. Structured tests can simplify your job as a
+tester.
+
+Within a workflow you can define child workflows, and groups of tests.
+Ultimately your workflow will return a list of testset objects. You can be as
+creative as you want in designing your workflow. You can also subclass
+L<Fennec::TestSet> or use L<Fennec::TestSet::SubSet> to wrap groups with
+buildup or teardown functions.
+
+Using the L<Fennec::Workflow> system it was a minimal effort to write an RSPEC
+like workflow. Less than 100 lines of code in SPEC.pm at the time this was
+written. If you do not like how Fennec implements SPEC you can probably
+implement it your own way easily.
+
 =head1 OVERVIEW
 
 When a test file is loaded L<Fennec::Runner> creates a root workflow, this root
 workflow is an L<Fennec::Workflow> object. Every testset or workflow defined in
-the test file is defined in the form of a method. These methods are blessed to
-the proper workflow or testset. The blessed methods are passed to the root
-workflow.
+the test file is a blessed method. The blessed methods are passed to a parent
+workflow. Those defined outside of a workflow are passed to a 'root' workflow.
 
-When a child workflow method is executed it will be possitioned as 'current',
-calling Fennec::Workflow->current will always return the current workflow, it
-will throw an exception if there is no current workflow. You can nest testsets
-and workflows by defining them inside a parent workflow method.
+Any testsets or workflows defined inside the method of a parent workflow are
+passed to that parent workflow. Each workflow object must inherit or
+imeplement the add_item() method which takes a workflow or testset. Testsets
+are retrieved from the workflows after they have been traversed to the deepest
+level.
 
 Example:
 
     package MyTest;
-    use Fennec;
-
-    # Export a function that is used to create an instance of the workflow.
-    export my_workflow => sub {
-        my ( $name, $sub ) = @_
-        Fennec::Workflow->current->add_item(
-            __PACKAGE__->new( $name, $sub )
-        );
-    };
+    use Fennec workflows => [ 'MyWorkflow' ];
 
     my_workflow parent => sub {
         tests 'parent tests' => {
@@ -50,20 +60,9 @@ Example:
 
 When Fennec runs it will load the file, it will create a root workflow, the
 workflow sub named 'parent' will be blessed and passed to the root workflow as
-a child workflow. Next Fennec will set 'parent' as the current workflow. The
-workflow sub 'nested' will be blessed as a workflow and passed to 'parent' as a
-child, it will then be set as current and executed.
-
-Fennec will grab the testsets from the workflows after they have all been
-traversed and executed. They will then optionally be randomized and executed.
-
-The above example is fairly silly, There is no reason to put 'child tests'
-within a child workflow. The only thing that makes nested workflows useful is
-using L<Fennec::TestSet::SubSet> or writing your own subclass of
-L<Fennec::TestSet> Doing so allows you to group tests, and add setup/teardown
-functions, or do anything you can think of. The SubSet will be run in random
-order with the other TestSets, however you can do whatever you want to the
-tests grouped within.
+a child workflow. The workflow sub 'nested' will be blessed as a workflow and
+passed to 'parent'. While this is going on the testsets will also be blessed
+and passed into their parent workflows.
 
 =head1 CUSTOM WORKFLOW SYNOPSYS
 
@@ -73,28 +72,21 @@ tests grouped within.
 
     use Fennec::Workflow qw/:subclass/;
 
-    # Code that should be executed just before running the tests
     build_hook { ... };
 
-    # Method that returns an array of TestSet objects.
+    build_with 'my_workflow';
+
     sub testsets {
-        my $self = shift;
-            my $subset = SubSet->new(
-                name => 'My Workflow Subset',
-                workflow  => $self,
-                file => $self->file,
-            );
-            $subset->add_setup( MySetup => sub { ... })
-            $subset->add_testset( MyTest => sub { ... })
-            $subset->add_teardown( MyTeardown => sub { ... })
+        ...
+        return @testsets;
     }
 
-    # You should always provide line numbers for where your tests were defined.
-    sub lines {
+    sub add_item {
         my $self = shift;
-        return 0 unless wantarray;
-        my $subset = $self->testsets;
-        return $subset->lines;
+        my ($item) = @_;
+
+        if ( we_handle( $item )) { ... }
+        else { $self->SUPER::add_item( $item )}
     }
 
     1;
@@ -108,9 +100,10 @@ that acts just like the root workflow.
 
 =item @testsets = $wf->testsets()
 
-testsets() should return an array with 0 or more testset objects or objects
-that subclass testset. These will be run by Fennec in random order mixed with
-other testsets from other workflows.
+testsets() should return an array with 0 or more testset objects, or objects
+that subclass testset. It is also responsible for returning the testsets from
+child workflows. If this method does not get testsets from child workflows they
+will not be run (which will generate a warning).
 
 =item $wf->build()
 
@@ -128,13 +121,23 @@ override this to reflect the change.
 =item $wf->add_item( $item )
 
 Add $item to the workflow. The inherited method will add workflows or testsets,
-it will throw an exception for anything else.
+it will throw an exception for anything else. You can access the added items
+via $self->_workflows() and $self->_testsets().
 
 =back
 
 =head1 HELPFUL FUNCTIONS
 
 =over 4
+
+=item build_with( $name )
+
+=item build_with( $name, $class )
+
+Exports a method ($name) that when called will create an instance of $class, or
+the class frin which build_with() was called. The exported method will take a
+single codeblock as an argument. After being build the instance will be added
+to the current in which it was defined.
 
 =item build_hook { ... }
 
@@ -161,6 +164,10 @@ method will also throw a redefine warning.
 =item @wfs = $wf->workflows()
 
 Returns a list of all the workflows added as children.
+
+=item @testsets = $wf->testsets()
+
+Returns a list of all the testsets in this workflow, and all of its children.
 
 =item $tf = $wf->testfile()
 
@@ -194,7 +201,7 @@ Overriding this in your subclass will have NO EFFECT.
 
 =item $wf->add_items( @items )
 
-Bulk form of add_item().
+Calls $wf->add_item() for each item in @items.
 
 =back
 
@@ -202,8 +209,20 @@ Bulk form of add_item().
 
 =over 4
 
-=item L<Fennec::Workflow> Documentation for the root workflow object,
+=item L<Fennec::Workflow>
+
+Documentation for the root workflow object,
 documentes inherited methods.
+
+=item L<Fennec::TestSet>
+
+Your workflow would not be very useful if it didn't return TestSet objects. You
+should familiarise yourself with them.
+
+=item L<Fennec::TestSet::SubSet>
+
+This is a subclass of TestSet which lets you group TestSets together with
+setups and teardowns wrapped around them.
 
 =back
 

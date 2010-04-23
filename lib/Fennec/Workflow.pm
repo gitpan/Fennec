@@ -47,6 +47,18 @@ export build_hook => sub(&) {
 
 export export => sub { goto &export };
 
+export build_with => sub {
+    my ( $name, $build ) = @_;
+    my ($class) = caller;
+    $build ||= $class;
+
+    $class->export( $name, sub {
+        Fennec::Workflow->current->add_item(
+            $build->new( @_ )
+        );
+    });
+};
+
 sub import {
     my $class = shift;
     my $caller = caller;
@@ -65,6 +77,8 @@ sub run_tests {
     my $self = shift;
         try {
             my @sets = $self->testsets;
+            $_->observed( 1 ) for @sets;
+
             if ( Runner->search ) {
                 @sets = $self->search_filter( Runner->search, \@sets );
             }
@@ -252,7 +266,6 @@ sub run_method_as_current {
 
 sub run_method_as_current_on {
     my $self = shift;
-    croak( 'xxx' ) unless blessed( $self );
     my ( $method, $obj, @args ) = @_;
     my $depth = $self->depth + 1;
 
@@ -265,7 +278,6 @@ sub run_method_as_current_on {
 
 sub run_sub_as_current {
     my $self = shift;
-    croak( 'xxx' ) unless blessed( $self );
     my ( $sub, @args ) = @_;
     my $depth = $self->depth + 1;
 

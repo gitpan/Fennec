@@ -12,18 +12,25 @@ use Fennec::Util::Accessors;
 use Try::Tiny;
 use Parallel::Runner;
 use Carp;
+use Digest::MD5 qw/md5_hex/;
 
 use Fennec::Util::Alias qw/
     Fennec::FileLoader
     Fennec::Output::Result
     Fennec::Output::Diag
+    Fennec::Config
+    Fennec::Runner::Proto
 /;
 
 use List::Util qw/shuffle/;
 use Time::HiRes qw/time/;
 use Benchmark qw/timeit :hireswallclock/;
 
-Accessors qw/files p_files p_tests threader ignore random pid parent_pid collector search default_asserts default_workflows _benchmark_time/;
+Accessors qw/
+    files parallel_files parallel_tests threader ignore random pid parent_pid
+    collector search default_asserts default_workflows _benchmark_time seed
+    _started _finished finish_hooks
+/;
 
 our $SINGLETON;
 
@@ -31,93 +38,92 @@ sub alias { $SINGLETON }
 
 sub init {
     my $class = shift;
-    my %proto = @_;
-
     croak( 'Fennec::Runner has already been initialized' )
         if $SINGLETON;
 
-    my $random = defined $proto{ random } ? $proto{ random } : 1;
-    my $handlers = delete $proto{ handlers } || [ 'TAP' ];
+    my $seed = $ENV{ FENNEC_SEED } || (( unpack "%L*", md5_hex( time * $$ )) ^ $$ );
+    srand( $seed );
 
-    my $collector_class = delete $proto{ collector } || 'Files';
-    $collector_class = 'Fennec::Collector::' . $collector_class;
-    eval "require $collector_class; 1" || die( $@ );
-    my $collector = $collector_class->new( @$handlers );
+    $SINGLETON = Proto->new( @_, seed => $seed )
+                      ->rebless($class);
 
-    my $ignore = delete $proto{ ignore };
-    my @files = FileLoader->find_types( delete $proto{ filetypes }, delete $proto{ files });
-    @files = grep {
-        my $file = $_;
-        !grep { $file =~ $_ } @$ignore
-    } @files if $ignore and @$ignore;
-    die ( "No Fennec files found" )
-        unless @files;
-    @files = shuffle @files if $random;
-
-    $proto{ p_files } = 2 unless defined $proto{ p_files };
-    $proto{ p_tests } = 2 unless defined $proto{ p_tests };
-    $proto{ cull_delay } = 0.1 unless $proto{ cull_delay };
-
-    $SINGLETON = bless(
-        {
-            %proto,
-            random      => $random,
-            files       => \@files,
-            collector   => $collector,
-            threader    => Parallel::Runner->new( $proto{ p_files }) || die( "No threader" ),
-            parent_pid  => $$,
-            pid         => $$,
-        },
-        $class
-    );
-    $SINGLETON->threader->iteration_delay( $proto{ cull_delay });
+    return $SINGLETON;
 }
 
-sub start {
+sub run_tests {
     my $self = shift;
-
-    $self->collector->start;
-    $self->threader->iteration_callback( sub { $self->collector->cull });
+    $self->start;
 
     for my $file ( @{ $self->files }) {
+        srand( $self->seed );
         $self->threader->run( sub {
             try {
+                $self->reset_benchmark;
                 my $workflow = Fennec::Workflow->new(
                     $file->filename,
                     method => sub { shift->file->load },
                     file => $file,
                 )->_build_as_root;
 
-                try {
-                    $workflow->run_sub_as_current( $_ )
-                        for Fennec::Workflow->build_hooks();
-                }
-                catch {
-                    Diag->new( "build_hook error: $_" )->write
-                };
-
-                my $testfile = $workflow->testfile;
-                return Result->skip_workflow( $testfile )
-                    if $testfile->fennec_meta->skip;
-
-                try {
-                    $workflow->build_children;
-                    my $benchmark = timeit( 1, sub {
-                        $workflow->run_tests( $self->search )
-                    });
-                }
-                catch {
-                    $testfile->fennec_meta->threader->finish;
-                    Result->fail_workflow( $testfile, $_ );
-                };
+                $self->process_workflow( $workflow );
             }
             catch {
                 Result->fail_testfile( $file, $_ );
             };
         }, 1 );
     }
+
+    $self->finish;
+}
+
+sub process_workflow {
+    my $self = shift;
+    my ( $workflow ) = @_;
+
+    $self->reset_benchmark;
+    try {
+        $workflow->run_sub_as_current( $_ )
+            for Fennec::Workflow->build_hooks();
+    }
+    catch {
+        Diag->new( "build_hook error: $_" )->write
+    };
+
+    my $testfile = $workflow->testfile;
+    return Result->skip_workflow( $testfile )
+        if $testfile->fennec_meta->skip;
+
+    try {
+        $workflow->build_children;
+        my $benchmark = timeit( 1, sub {
+            $self->reset_benchmark;
+            $workflow->run_tests( $self->search )
+        });
+    }
+    catch {
+        $testfile->fennec_meta->threader->finish;
+        Result->fail_workflow( $testfile, $_ );
+    };
+}
+
+sub start {
+    my $self = shift;
+    $self->collector->start;
+    $self->threader->iteration_callback( sub { $self->collector->cull });
+    $self->_started(1);
+}
+
+sub finish {
+    my $self = shift;
+    $self->$_() for @{ $self->finish_hooks || []};
     $self->threader->finish;
     $self->collector->finish;
+    $self->_finished(1);
+}
+
+sub add_finish_hook {
+    my $self = shift;
+    push @{ $self->{ finish_hooks }} => @_;
 }
 
 sub pid_changed {
@@ -159,6 +165,27 @@ sub benchmark {
     }
     my $new = $self->reset_benchmark;
     return [( $new - $old )];
+}
+
+sub DESTROY {
+    my $self = shift;
+    return if $self->is_subprocess;
+    if( $self->_started && !$self->_finished ) {
+        warn <<EOT;
+Runner never finished!
+Did you forget to run finish() in a standalone test file?
+EOT
+    }
+    print STDERR <<EOT
+
+
+=====================================
+The ordering of this run can be reproduced using the seed: @{[ $self->seed ]}
+Example: \$ FENNEC_SEED='@{[ $self->seed ]}' prove -I lib t/Fennec.t
+=====================================
+
+
+EOT
 }
 
 1;

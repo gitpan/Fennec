@@ -3,18 +3,36 @@ use strict;
 use warnings;
 
 use Cwd;
-use Fennec::Runner;
+
+use Fennec::Util::Alias qw/
+    Fennec::Runner
+/;
+
 'Fennec::Runner'->init(
-    p_files => 2,
-    p_tests => 2,
+    parallel_files => 2,
+    parallel_tests => 2,
+    cull_delay => .01,
     handlers => [qw/ TAP /],
     random => 1,
     Collector => 'Files',
     ignore => undef,
     filetypes => [qw/ Module /],
-    default_asserts => [qw/Interceptor/],
-    $ENV{ FENNEC_FILE } ? ( files => [ cwd() . '/' . $ENV{ FENNEC_FILE }]) : (),
-    $ENV{ FENNEC_ITEM } ? ( search => $ENV{ FENNEC_ITEM }) : (),
+    default_asserts => [qw/Core/],
+    default_workflows => [qw/Spec Case Methods/],
 );
 
-Runner->start;
+Runner()->run_tests;
+
+=head1 AUTHORS
+
+Chad Granum L<exodist7@gmail.com>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2010 Chad Granum
+
+Fennec is free software; Standard perl licence.
+
+Fennec is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the license for more details.

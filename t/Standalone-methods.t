@@ -1,10 +1,10 @@
-package TEST::Fennec::Workflow::Methods;
+#!/usr/bin/perl;
+package TEST::StandaloneCore;
 use strict;
 use warnings;
-
-use Fennec workflows => [ 'Methods' ],
-           sort => 1,
-           no_fork => 1;
+use Fennec::Standalone workflows => [ 'Methods' ],
+                       sort => 1,
+                       no_fork => 1;
 
 use Fennec::Util::Accessors;
 
@@ -34,6 +34,8 @@ tests 'Z - Run this last' => sub {
     is( $self->did_run_tests, 2, "Ran test second" );
     is( $self->did_run_teardown, 3, "Ran teardown last" );
 };
+
+finish;
 
 1;
 

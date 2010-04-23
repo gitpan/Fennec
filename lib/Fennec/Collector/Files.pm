@@ -7,9 +7,11 @@ use base 'Fennec::Collector';
 use Fennec::Runner;
 use Fennec::FileLoader;
 use Data::Dumper;
+use File::Temp qw/tempdir/;
 
 our %BADFILES;
 our $SEMI_UNIQ = 1;
+our $TEMPDIR;
 
 sub bad_files { \%BADFILES }
 
@@ -98,7 +100,12 @@ sub write {
     rename ( $file, "$file.res" );
 }
 
-sub testdir { Fennec::FileLoader->root . "/_test" }
+sub testdir {
+    unless ( $TEMPDIR ) {
+        $TEMPDIR = tempdir( Fennec::FileLoader->root . "/_$$\_test_XXXX" );
+    }
+    return $TEMPDIR;
+}
 
 sub prepare {
     my $self = shift;
@@ -121,3 +128,17 @@ sub cleanup {
 }
 
 1;
+
+=head1 AUTHORS
+
+Chad Granum L<exodist7@gmail.com>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2010 Chad Granum
+
+Fennec is free software; Standard perl licence.
+
+Fennec is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the license for more details.

@@ -20,10 +20,10 @@ lib/Fennec/Base/Method.pm
 lib/Fennec/Collector.pm
 lib/Fennec/Collector/Files.pm
 lib/Fennec/Collector/Interceptor.pm
+lib/Fennec/Config.pm
 lib/Fennec/Debug.pm
 lib/Fennec/FileLoader.pm
 lib/Fennec/FileLoader/Module.pm
-lib/Fennec/FileLoader/Standalone.pm
 lib/Fennec/Handler.pm
 lib/Fennec/Handler/.keep
 lib/Fennec/Handler/TAP.pm
@@ -31,6 +31,7 @@ lib/Fennec/Manual.pod
 lib/Fennec/Manual/Assertions.pod
 lib/Fennec/Manual/Collectors.pod
 lib/Fennec/Manual/CommandLine.pod
+lib/Fennec/Manual/Features.pod
 lib/Fennec/Manual/Files.pod
 lib/Fennec/Manual/Handlers.pod
 lib/Fennec/Manual/Mission.pod
@@ -46,6 +47,8 @@ lib/Fennec/Output/Diag.pm
 lib/Fennec/Output/Result.pm
 lib/Fennec/Runner.pm
 lib/Fennec/Runner/.keep
+lib/Fennec/Runner/Proto.pm
+lib/Fennec/Standalone.pm
 lib/Fennec/TestFile.pm
 lib/Fennec/TestFile/Meta.pm
 lib/Fennec/TestSet.pm
@@ -81,8 +84,10 @@ t/Fennec/Assert/Core/Simple.pm
 t/Fennec/Assert/Core/Warn.pm
 t/Fennec/Handler.pm
 t/Fennec/Handler/TAP.pm
+t/Fennec/TestSet.pm
 t/Fennec/Workflow/Case.pm
 t/Fennec/Workflow/Methods.pm
 t/Fennec/Workflow/Spec.pm
 t/Standalone-core.t
+t/Standalone-methods.t
 t/Standalone.t
