@@ -3,55 +3,126 @@ use strict;
 use warnings;
 
 use Carp;
+use Fennec::Util::TBOverride;
+use Fennec::Util::PackageFinder;
 
 use Fennec::Util::Alias qw/
     Fennec::Runner
     Fennec::TestFile
+    Fennec::Assert
+    Fennec::TestFile::Meta
 /;
 
-our $VERSION = "0.017";
-our $TEST_CLASS;
-our @TEST_CLASS_ARGS;
-
-sub _clear_test_class { $TEST_CLASS = undef }
-sub _test_class { $TEST_CLASS }
-sub _test_class_args { @TEST_CLASS_ARGS }
+our $VERSION = "0.018";
+our @META_DATA = qw/todo skip random sort no_fork/;
 
 sub import {
     my $class = shift;
     my %proto = @_;
-    my ( $caller, $file, $line ) = $proto{ caller } ? (@{$proto{ caller }}) : caller;
-    my ( $workflows, $asserts ) = @proto{qw/ workflows asserts /};
-    my $standalone = delete $proto{ standalone };
+    $proto{ caller } ||= [ caller ];
+    $proto{ meta } = { map {( $_ => delete $proto{$_} || undef)} @META_DATA };
+    delete $proto{ standalone };
+
+    my $fennec = $class->new( %proto );
+    $fennec->subclass;
+    $fennec->init_meta;
+    $fennec->export_tools;
+    $fennec->export_workflows;
+    $fennec->export_asserts;
+
+    1;
+}
+
+sub new {
+    my $class = shift;
+    my %proto = @_;
+    my $self = bless( \%proto, $class );
+    $self->sanity;
+    return $self;
+}
+
+sub sanity {
+    my $self = shift;
+    if ( Meta->get( $self->test_class )) {
+        croak "Meta info for '"
+           . $self->test_class
+           . "' already initialized, did you 'use Fennec' twice?";
+    }
 
     croak "Test runner not found"
         unless Runner;
     croak( "You must put your tests into a package, not main" )
-        if $caller eq 'main';
+        if $self->test_class eq 'main';
+}
 
-    $TEST_CLASS = $caller;
-    @TEST_CLASS_ARGS = @_;
+sub test_class {
+    my $self = shift;
+    return $self->{caller}->[0];
+}
 
-    {
-        no strict 'refs';
-        push @{ $caller . '::ISA' } => TestFile;
-    }
+sub test_file {
+    my $self = shift;
+    return $self->{caller}->[1];
+}
 
-    _export_package_to( 'Fennec::TestSet', $caller );
+sub imported_line {
+    my $self = shift;
+    return $self->{caller}->[2];
+}
 
-    $workflows ||= Runner->default_workflows || [];
-    _export_package_to( 'Fennec::Workflow::' . $_, $caller )
-        for @$workflows;
+sub workflows {
+    my $self = shift;
+    return $self->{workflows} || Runner->default_workflows;
+}
 
-    $asserts ||= Runner->default_asserts || [ qw/ Core / ];
-    _export_package_to( 'Fennec::Assert::' . $_, $caller )
-        for @$asserts;
+sub asserts {
+    my $self = shift;
+    return $self->{asserts} || Runner->default_asserts;
+}
+
+sub root_workflow {
+    my $self = shift;
+    return $self->{root_workflow} || Runner->root_workflow_class;
+}
+
+sub subclass {
+    my $self = shift;
+    return if $self->test_class->isa( TestFile );
+    no strict 'refs';
+    push @{ $self->test_class . '::ISA' } => TestFile;
+}
+
+sub init_meta {
+    my $self = shift;
+
+    my $meta = Meta->new(
+        %{ $self->{ meta }},
+        file          => $self->test_file,
+        root_workflow => $self->root_workflow,
+    );
+    Meta->set( $self->test_class, $meta );
+}
+
+sub export_tools {
+    my $self = shift;
+    _export_package_to( 'Fennec::TestSet', $self->test_class );
 
     no strict 'refs';
-    no warnings 'redefine';
-    *{ $caller . '::finish' } = sub { carp "calling finish() is only required for Fennec::Standalone tests" };
+    *{ $self->test_class . '::done_testing' } = \&_done_testing;
+    *{ $self->test_class . '::use_or_skip' } = \&_use_or_skip;
+    *{ $self->test_class . '::require_or_skip' } = \&_require_or_skip;
+}
 
-    1;
+sub export_workflows {
+    my $self = shift;
+    _export_package_to( load_package( $_, 'Fennec::Workflow' ), $self->test_class )
+        for @{ $self->workflows };
+}
+
+sub export_asserts {
+    my $self = shift;
+    _export_package_to( load_package( $_, 'Fennec::Assert' ), $self->test_class )
+        for @{ $self->asserts };
 }
 
 sub _export_package_to {
@@ -59,6 +130,33 @@ sub _export_package_to {
     die( $@ ) unless eval "require $from; 1";
     $from->export_to( $to );
 }
+
+sub _done_testing {
+    carp "calling done_testing() is only required for Fennec::Standalone tests"
+};
+
+sub _use_or_skip(*;@) {
+    my ( $package, @params ) = @_;
+    my $caller = caller;
+    my $eval = "package $caller; use $package"
+    . (@params ? (
+        @params > 1
+            ? ' @params'
+            : ($params[0] =~ m/^[0-9\-\.\e]+$/
+                ? " $params[0]"
+                : " '$params[0]'"
+              )
+      ) : '')
+    . "; 1";
+    my $have = eval $eval;
+    die "SKIP: $package is not installed or insufficient version: $@" unless $have;
+};
+
+sub _require_or_skip(*) {
+    my ( $package ) = @_;
+    my $have = eval "require $package; 1";
+    die "SKIP: $package is not installed\n" unless $have;
+};
 
 1;
 
@@ -95,6 +193,8 @@ Fennec offers the following features, among others.
 =item No use of END blocks
 
 =item No Devel::Declare magic
+
+=item No use of Sub::Uplevel
 
 =item No source filters
 

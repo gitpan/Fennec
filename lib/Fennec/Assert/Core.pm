@@ -22,6 +22,43 @@ sub import {
 
 1;
 
+=head1 NAME
+
+Fennec::Assert::Core - Shortcut to load all core assertion libraries.
+
+=head1 DESCRIPTION
+
+Loads all the following assertion libraries:
+
+=over 4
+
+=item L<Fennec::Assert::Core::Simple>
+
+=item L<Fennec::Assert::Core::More>
+
+=item L<Fennec::Assert::Core::Exception>
+
+=item L<Fennec::Assert::Core::Warn>
+
+=item L<Fennec::Assert::Core::Package>
+
+=item L<Fennec::Assert::Core::Anonclass>
+
+=back
+
+=head1 CLASS METHODS
+
+=over 4
+
+=item $class->export_to( $package )
+
+=item $class->export_to( $package, $prefix )
+
+Export all assertions to the specified package. An optional prefix may be
+appended to all assertion names.
+
+=back
+
 =head1 AUTHORS
 
 Chad Granum L<exodist7@gmail.com>

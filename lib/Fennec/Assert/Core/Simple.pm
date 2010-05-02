@@ -4,6 +4,7 @@ use warnings;
 
 use Fennec::Util::Alias qw/
     Fennec::Output::Result
+    Fennec::Output::BailOut
 /;
 
 use Fennec::Assert;
@@ -31,6 +32,10 @@ tester ok => sub {
         pass => $ok ? 1 : 0,
         name => $name || 'nameless test',
     );
+};
+
+util bail_out => sub {
+    BailOut->new( stderr => [@_] )->write;
 };
 
 1;
@@ -67,6 +72,10 @@ These utils are exported in addition to the testers, they do not produce any
 results.
 
 =over 4
+
+=item bail_out( @reasons )
+
+Tell fennec to stop everything, somethings wrong, just stop.
 
 =item TODO(sub { ... }; $reason)
 

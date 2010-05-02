@@ -43,7 +43,7 @@ L<Fennec::Manual::Vim> - Vim tools and rc files provided with the dist.
 
 =item Running Fennec
 
-L<Fennec::Manual::Running> - How to run individual Fennec test files, or even
+L<Fennec::Manual::Running> - How to run individual Fennec test files, or
 zeroing in on specific testsets.
 
 =back
@@ -71,8 +71,8 @@ L<Fennec::Manual::Assertions> - Guide to writing custom assertion libraries
 Many L<Test::Builder> tools will work as expected within Fennec, however some
 may require, or can be improved by wrapping them into Fennec.
 
-L<Fennec::Manual::TBAssertions> - Guide to wrapping L<Test::Builder> based
-tools for use within fennec.
+L<Fennec::Manual::TBAssertions> - Using L<Test::Builder> based tools with
+Fennec.
 
 =item Core Assertion Libraries
 
@@ -125,7 +125,7 @@ L<Fennec::Manual::Workflows>
 L<Fennec::Workflow::Module> - Workflow that lets you define testsets and
 setup/teardown as methods on your test object.
 
-L<Fennec::Workflow::SPEC> - Implementation of the SPEC test workflow
+L<Fennec::Workflow::Spec> - Implementation of the SPEC test workflow
 
 L<Fennec::Workflow::Case> - A workflow that lets you run testsets under
 multiple cases.

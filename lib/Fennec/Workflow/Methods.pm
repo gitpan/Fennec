@@ -17,14 +17,17 @@ use Carp;
 
 Accessors qw/subset/;
 
-build_hook { Workflow->add_item( __PACKAGE__->new )};
+build_hook {
+    my ( $root_workflow ) = @_;
+    $root_workflow->add_item( __PACKAGE__->new )
+};
 
 sub new {
     my $class = shift;
     return bless({ method => sub {1}, children => [] }, $class );
 }
 
-sub add_item { croak 'Child workflows cannot be added to the Methods workflow' }
+sub add_item { croak 'Children cannot be added to the Methods workflow' }
 
 sub testsets {
     my $self = shift;
@@ -32,6 +35,10 @@ sub testsets {
     unless( $self->subset ) {
         my $testfile = $self->testfile;
         my $tclass = blessed( $testfile );
+
+        my @tests = Fennec::Util->package_sub_map( $tclass, qr/^test_/i );
+        return unless @tests;
+
         my $subset = SubSet->new(
             name => 'Test Methods',
             workflow  => $self,
@@ -41,8 +48,7 @@ sub testsets {
             for sort { $a->[0] cmp $b->[0] }
                 Fennec::Util->package_sub_map( $tclass, qr/^setup/i );
 
-        $subset->add_testset( @$_ )
-            for Fennec::Util->package_sub_map( $tclass, qr/^test_/i );
+        $subset->add_testset( @$_ ) for @tests;
 
         $subset->add_teardown( @$_ )
             for sort { $a->[0] cmp $b->[0] }

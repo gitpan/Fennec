@@ -29,15 +29,24 @@ sub serialize {
             %$self,
             _workflow => undef,
             testset => undef,
-            workflow_stack => $self->workflow_stack,
+            workflow_stack => $self->workflow_stack || undef,
         },
         bless => ref( $self ),
     };
 }
 
+sub deserialize {
+    my $class = shift;
+    my ($serialized) = @_;
+    my $bless = $serialized->{ bless };
+    my $data = $serialized->{ data };
+    eval "require $bless" || die( $@ );
+    return bless( $data, $bless );
+}
+
 sub write {
     my $self = shift;
-    $self->timestamp( time ) unless $self->timestamp;
+    $self->timestamp( time() ) unless $self->timestamp;
     Runner->collector->write( $self );
 }
 

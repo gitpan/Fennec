@@ -1,24 +1,28 @@
-package Fennec::FileLoader::Module;
+package Fennec::Output::Note;
 use strict;
 use warnings;
 
-use base 'Fennec::FileLoader';
+use base 'Fennec::Output';
 
-sub valid_file {
-    my $self = shift;
-    my ( $file ) = @_;
-    return $file =~ m{/t/.*\.pm$} ? 1 : 0;
+sub new {
+    my $class = shift;
+    return bless( { @_ }, $class );
 }
-
-sub load_file {
-    my $self = shift;
-    my $file = $self->filename;
-    require $file;
-}
-
-sub paths { 't/' }
 
 1;
+
+=head1 NAME
+
+Fennec::Output::Note - Represents a note output object.
+
+=head1 DESCRIPTION
+
+See L<Fennec::Output>
+
+=head1 SYNOPSIS
+
+    use Fennec::Output::Note;
+    $note = Fennec::Output::Note->new( stdout => \@messages );
 
 =head1 AUTHORS
 

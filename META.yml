@@ -18,7 +18,7 @@ no_index:
 provides:
   Fennec:
     file: lib/Fennec.pm
-    version: 0.017
+    version: 0.018
   Fennec::Assert:
     file: lib/Fennec/Assert.pm
   Fennec::Assert::Core:
@@ -61,16 +61,22 @@ provides:
     file: lib/Fennec/Debug.pm
   Fennec::FileLoader:
     file: lib/Fennec/FileLoader.pm
-  Fennec::FileLoader::Module:
-    file: lib/Fennec/FileLoader/Module.pm
+  Fennec::FileType:
+    file: lib/Fennec/FileType.pm
+  Fennec::FileType::Module:
+    file: lib/Fennec/FileType/Module.pm
   Fennec::Handler:
     file: lib/Fennec/Handler.pm
   Fennec::Handler::TAP:
     file: lib/Fennec/Handler/TAP.pm
   Fennec::Output:
     file: lib/Fennec/Output.pm
+  Fennec::Output::BailOut:
+    file: lib/Fennec/Output/BailOut.pm
   Fennec::Output::Diag:
     file: lib/Fennec/Output/Diag.pm
+  Fennec::Output::Note:
+    file: lib/Fennec/Output/Note.pm
   Fennec::Output::Result:
     file: lib/Fennec/Output/Result.pm
   Fennec::Runner:
@@ -97,6 +103,10 @@ provides:
     file: lib/Fennec/Util/Accessors.pm
   Fennec::Util::Alias:
     file: lib/Fennec/Util/Alias.pm
+  Fennec::Util::PackageFinder:
+    file: lib/Fennec/Util/PackageFinder.pm
+  Fennec::Util::TBOverride:
+    file: lib/Fennec/Util/TBOverride.pm
   Fennec::Workflow:
     file: lib/Fennec/Workflow.pm
   Fennec::Workflow::Case:
@@ -116,7 +126,7 @@ requires:
   File::Temp: 0
   List::MoreUtils: 0
   List::Util: 0
-  Parallel::Runner: 0.004
+  Parallel::Runner: 0.006
   Scalar::Util: 0
   Time::HiRes: 0
   Try::Tiny: 0
@@ -124,4 +134,4 @@ resources:
   bugtracker: http://github.com/exodist/Fennec/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/exodist/Fennec
-version: 0.017
+version: 0.018

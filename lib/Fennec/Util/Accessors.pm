@@ -26,10 +26,6 @@ sub build_accessors {
     for my $accessor ( @list ) {
         my $sub = sub {
             my $self = shift;
-            croak ( "$caller\->$accessor() is an object method, not a class method." )
-                if $self eq $caller;
-            confess( "$accessor() called on something other than an instance of $caller - how'd you do that?" )
-                unless blessed($self) and $self->isa( $caller );
             ($self->{ $accessor }) = @_ if @_;
             return $self->{ $accessor };
         };
@@ -40,6 +36,55 @@ sub build_accessors {
 }
 
 1;
+
+=head1 NAME
+
+Fennec::Util::Accessors - Quick and dirty read-write accessor generator
+
+=head1 DESCRIPTION
+
+Provides a function that lets you quickyl generate basic read-write accessors.
+Assumes your object is a blessed hash.
+
+=head1 SYNOPSIS
+
+    package MyPackage;
+    use Fennec::Util::Accessors;
+    Accessors qw/ thing stuff foo bar /;
+
+    ...
+
+    1;
+
+=head1 EXPORTS
+
+=over 4
+
+=item Accessors( @list )
+
+Add basic read/write accessors to the calling class. Each item in @list will be
+assumed to be the name of the accessor.
+
+=back
+
+=head1 API (CLASS METHODS)
+
+=over 4
+
+=item build_accessors( $package, @list )
+
+Adds accessors in list() to $package.
+
+=item import()
+
+Imports 'Accessors' into the callers namespace.
+
+=item alias()
+
+Used by L<Fennec::Util::Alias> so that when using this package aliased the
+Accessors function behaves properly.
+
+=back
 
 =head1 AUTHORS
 

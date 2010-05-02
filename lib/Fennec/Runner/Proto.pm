@@ -6,6 +6,7 @@ use Parallel::Runner;
 use Carp;
 use Digest::MD5 qw/md5_hex/;
 use Cwd;
+use Fennec::Util::PackageFinder;
 
 use Fennec::Util::Alias qw/
     Fennec::FileLoader
@@ -17,6 +18,12 @@ use List::Util qw/shuffle/;
 use Time::HiRes qw/time/;
 
 Accessors qw/in/;
+
+our @PROPERTIES = qw/
+    ignore files collector handlers cull_delay threader parallel_files
+    parallel_tests seed random filetypes default_asserts default_workflows
+    search root_workflow_class
+/;
 
 sub new {
     my $class = shift;
@@ -42,55 +49,34 @@ sub _or_config {
     my ( $name, $default ) = @_;
     my %config = Config->fetch;
 
-    return $config{ overrides }->{ $name }
+    return $ENV{ 'FENNEC_' . uc( $name )}
+        || $config{ overrides }->{ $name }
         || $self->in->{ $name }
         || $config{ defaults }->{ $name }
         || $default;
 }
 
-for my $accessor (
-qw/
-    ignore files collector handlers cull_delay threader parallel_files
-    parallel_tests seed random data filetypes default_asserts default_workflows
-    search
-/
-) {
+for my $property ( @PROPERTIES, 'data' ) {
     my $sub = sub {
         my $self = shift;
         my ( $data_only ) = @_;
-        my $get_from = "_$accessor";
+        my $get_from = "_$property";
 
-        $self->{ $accessor } = $self->$get_from
-            unless exists $self->{ $accessor };
+        $self->{ $property } = $self->$get_from
+            unless exists $self->{ $property };
 
-        return $self->{ $accessor } if $data_only;
-        return defined $self->{ $accessor }
-            ? ($accessor => $self->{ $accessor })
+        return $self->{ $property } if $data_only;
+        return defined $self->{ $property }
+            ? ($property => $self->{ $property })
             : ();
     };
     no strict 'refs';
-    *$accessor = $sub;
+    *$property = $sub;
 }
 
 sub _data {
     my $self = shift;
-    return { map {( $self->$_ )} qw/
-        collector
-        cull_delay
-        default_asserts
-        default_workflows
-        files
-        filetypes
-        handlers
-        ignore
-        parallel_files
-        parallel_tests
-        pids
-        random
-        search
-        seed
-        threader
-    / };
+    return { map {( $self->$_ )} (@PROPERTIES, 'pids') };
 }
 
 sub _ignore {
@@ -127,14 +113,21 @@ sub _collector {
 
     my $collector_class = $self->_or_config( 'collector', 'Files' );
 
-    $collector_class = 'Fennec::Collector::' . $collector_class;
-    eval "require $collector_class; 1" || die( $@ );
+    $collector_class = load_package( $collector_class, 'Fennec::Collector' );
     return $collector_class->new( @{ $self->handlers( 1 )});
+}
+
+sub _root_workflow_class {
+    my $self = shift;
+    my $class = $self->_or_config( 'root_workflow_class', 'Fennec::Workflow' );
+    return load_package( $class, 'Fennec::Workflow' );
 }
 
 sub _handlers {
     my $self = shift;
     my $handlers = $self->in->{ handlers } || [ 'TAP' ];
+    load_package( $_, 'Fennec::Handler' ) for @$handlers;
+    return $handlers;
 }
 
 sub _cull_delay {
@@ -178,17 +171,23 @@ sub _random {
 
 sub _filetypes {
     my $self = shift;
-    return $self->in->{ filetypes } || [qw/ Module /];
+    my $types = $self->in->{ filetypes } || [qw/ Module /];
+    load_package( $_, 'Fennec::FileType' ) for @$types;
+    return $types;
 }
 
 sub _default_asserts {
     my $self = shift;
-    return $self->in->{ default_asserts } || [qw/ Core /];
+    my $asserts = $self->in->{ default_asserts } || [qw/ Core /];
+    load_package( $_, 'Fennec::Assert' ) for @$asserts;
+    return $asserts;
 }
 
 sub _default_workflows {
     my $self = shift;
-    return $self->in->{ default_workflows } || [qw/Spec Case Methods/],
+    my $workflows = $self->in->{ default_workflows } || [qw/Spec Case Methods/];
+    load_package( $_, 'Fennec::Workflow' ) for @$workflows;
+    return $workflows;
 }
 
 sub _search {

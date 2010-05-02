@@ -6,136 +6,121 @@ use Fennec::Util::Alias qw/
     Fennec::Runner
     Fennec::Output::Result
     Fennec::Output::Diag
+    Fennec::Output::Note
 /;
 
 use Try::Tiny;
-use Time::HiRes qw/time/;
-use Benchmark qw/timeit :hireswallclock/;
+use Fennec::Util::TBOverride;
 use Carp qw/confess croak carp cluck/;
 use Scalar::Util 'blessed';
 use Exporter::Declare ':extend';
 
-our @EXPORT = qw/tb_wrapper tester util result diag test_caller/;
+our @EXPORT = qw/tb_wrapper tester util result diag test_caller note/;
 our @CARP_NOT = qw/ Try::Tiny Benchmark /;
 
 our $TB_RESULT;
 our @TB_DIAGS;
-our $TB_OK;
-our %TB_OVERRIDES;
-BEGIN {
-    %TB_OVERRIDES = (
-        _ending => sub {},
-        _my_exit => sub {},
-        exit => sub {},
-        ok => sub {
-            shift;
-            my ( $ok, $name ) = @_;
-            result(
-                test_caller(),
-                pass => $ok,
-                name => $name,
-            ) unless $TB_OK;
-            $TB_RESULT = [ $ok, $name ];
-        },
-        diag => sub {
-            shift;
-            return if $_[0] =~ m/No tests run!/;
-            diag( @_ ) unless $TB_OK;
-            push @TB_DIAGS => @_;
-        },
-        note => sub {
-            shift;
-            diag( @_ ) unless $TB_OK;
-            push @TB_DIAGS => @_;
-        }
-    );
-
-    if ( eval { require Test::Builder; 1 }) {
-        Test::Builder->new->plan('no_plan');
-        for my $ref (keys %TB_OVERRIDES) {
-            no warnings 'redefine';
-            no strict 'refs';
-            my $newref = "real_$ref";
-            *{ 'Test::Builder::' . $newref } = \&$ref;
-            *{ 'Test::Builder::' . $ref    } = $TB_OVERRIDES{ $ref };
-        }
-    }
-}
+our @TB_NOTES;
+our $TB_OK = 0;
 
 sub util { goto &export }
 
-sub tester {
-    my ( $assert_class, $sub );
+sub _name_sub_and_assert_class_from_args {
+    my ( $name, $sub, $assert_class );
 
     $sub = pop( @_ ) if ref( $_[-1] ) && ref( $_[-1] ) eq 'CODE';
     $assert_class = shift( @_ ) if @_ > 1;
-    my ( $name ) = @_;
-    $assert_class = blessed( $assert_class ) || $assert_class || caller;
-
-    croak( "You must provide a name to tester()" )
-        unless $name;
+    ( $name ) = @_;
+    $assert_class = blessed( $assert_class ) || $assert_class || caller(1);
     $sub ||= $assert_class->can( $name );
+    return (
+        $name || undef,
+        $sub || undef,
+        $assert_class || undef,
+    );
+}
+
+sub tester {
+    my ( $name, $sub, $assert_class ) = _name_sub_and_assert_class_from_args( @_ );
     croak( "No code found in '$assert_class' for exported sub '$name'" )
         unless $sub;
+    croak( "You must provide a name to tester()" )
+        unless $name;
 
     my $wrapsub = sub {
         my @args = @_;
-        my @outresults;
-        my ( $caller, $file, $line ) = caller;
         my %caller = test_caller();
-        my $return = 1;
-        try {
-            no warnings 'redefine';
-            no strict 'refs';
-            local *{ $assert_class . '::result' } = sub {
-                shift( @_ ) if blessed( $_[0] );
-                push @outresults => { @_ };
-            };
-            $sub->( @args );
-
-            # Try to provide a minimum diag for failed tests that do not provide
-            # their own.
-            for my $outresult ( @outresults ) {
-                if ( !$outresult->{ pass }
-                && ( !$outresult->{ stderr } || !@{ $outresult->{ stderr }})) {
-                    my @diag;
-                    $outresult->{ stderr } = \@diag;
-                    for my $i ( 0 .. (@args - 1)) {
-                        my $arg = $args[$i];
-                        $arg = 'undef' unless defined( $arg );
-                        next if "$arg" eq $outresult->{ name } || "";
-                        push @diag => "\$_[$i] = '$arg'";
-                    }
-                }
-
-                $return &&= result(
-                    %caller,
-                    %$outresult
-                ) if $outresult;
-            }
+        return try {
+            return _process_wrapped_results(
+                \@args,
+                _wrap_results( $sub, $assert_class, \@args )
+            );
         }
         catch {
-            result(
-                pass => 0,
-                %caller,
-                stderr => [ "$name died: $_" ],
-            );
-            $return = 0;
+            my $err = [ "$name died: $_" ];
+            return result( pass => 0, %caller, stderr => $err );
         };
-        return $return;
     };
 
-    my $proto = prototype( $sub );
-    my $newsub = $proto ? eval "sub($proto) { \$wrapsub->( \@_ )}" || die($@)
-                        : $wrapsub;
+    $assert_class->export(
+        $name,
+        wrap_with_proto( $wrapsub, prototype( $sub ))
+    );
+}
 
-    $assert_class->export( $name, $newsub );
+sub _wrap_results {
+    my ( $sub, $assert_class, $args ) = @_;
+    my @outresults;
+
+    no warnings 'redefine';
+    no strict 'refs';
+    local *{ $assert_class . '::result' } = sub {
+        shift( @_ ) if blessed( $_[0] );
+        push @outresults => { @_ };
+    };
+
+    $sub->( @$args );
+    return @outresults;
+}
+
+sub _process_wrapped_results {
+    my ( $args, @outresults ) = @_;
+    my %caller = test_caller();
+    my $return = 1;
+
+    for my $outresult ( @outresults ) {
+        # Try to provide a minimum diag for failed tests that do not provide
+        # their own.
+        if ( !$outresult->{ pass } && !$outresult->{ stderr }) {
+            my @diag;
+            $outresult->{ stderr } = \@diag;
+            for my $i ( 0 .. (@$args - 1)) {
+                my $arg = $args->[$i];
+                $arg = 'undef' unless defined( $arg );
+                next if "$arg" eq $outresult->{ name } || "";
+                push @diag => "\$_[$i] = '$arg'";
+            }
+        }
+
+        $return &&= result(
+            %caller,
+            %$outresult
+        ) if $outresult;
+    }
+
+    return $return;
 }
 
 sub diag {
     shift( @_ ) if blessed( $_[0] )
                 && blessed( $_[0] )->isa( __PACKAGE__ );
     Fennec::Output::Diag->new( stderr => \@_ )->write;
+}
+
+sub note {
+    shift( @_ ) if blessed( $_[0] )
+                && blessed( $_[0] )->isa( __PACKAGE__ );
+    Fennec::Output::Note->new( stdout => \@_ )->write;
 }
 
 sub result {
@@ -155,22 +140,22 @@ sub tb_wrapper(&) {
     shift( @_ ) if blessed( $_[0] )
                 && blessed( $_[0] )->isa( __PACKAGE__ );
     my ( $orig ) = @_;
-    my $proto = prototype( $orig );
     my $wrapper = sub {
         my @args = @_;
-        local $TB_OK = 1;
-        local ( $TB_RESULT, @TB_DIAGS );
+        local $Fennec::Assert::TB_OK = 1;
+        local $Fennec::Assert::TB_RESULT;
+        local @Fennec::Assert::TB_DIAGS;
+        local @Fennec::Assert::TB_NOTES;
         $orig->( @args );
         return diag( @TB_DIAGS ) unless $TB_RESULT;
         return result(
-            pass      => $TB_RESULT->[0],
-            name      => $TB_RESULT->[1],
-            stderr    => [@TB_DIAGS],
+            pass      => $Fennec::Assert::TB_RESULT->[0],
+            name      => $Fennec::Assert::TB_RESULT->[1],
+            stderr    => \@Fennec::Assert::TB_DIAGS,
+            stdout    => \@Fennec::Assert::TB_NOTES,
         );
     };
-    return $wrapper unless $proto;
-    # Preserve the prototype
-    return eval "sub($proto) { \$wrapper->(\@_) }";
+    return wrap_with_proto( $wrapper, prototype( $orig ));
 }
 
 sub test_caller {
@@ -187,6 +172,12 @@ sub test_caller {
     );
 }
 
+sub wrap_with_proto {
+    my ( $sub, $proto ) = @_;
+    return $sub unless $proto;
+    return eval "sub($proto) { \$sub->( \@_ )}"
+        || die($@);
+}
 1;
 
 =head1 DESCRIPTION
@@ -261,6 +252,10 @@ L<Fennec::Output::Result> construction parameters.
 =item diag( @messages )
 
 Issue a L<Fennec::Output::Diag> object with the provided messages.
+
+=item note( @messages )
+
+Issue a L<Fennec::Output::Note> object with the provided messages.
 
 =back
 

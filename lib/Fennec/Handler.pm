@@ -1,6 +1,7 @@
 package Fennec::Handler;
 use strict;
 use warnings;
+use Carp qw/cluck/;
 
 sub new {
     my $class = shift;
@@ -18,7 +19,7 @@ sub handle {
 
 sub finish {1}
 sub start {1}
-sub bail_out {1}
+sub starting_file {1}
 sub fennec_error {1}
 
 1;

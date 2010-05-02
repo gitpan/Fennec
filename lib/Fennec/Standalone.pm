@@ -2,6 +2,7 @@ package Fennec::Standalone;
 use strict;
 use warnings;
 require Fennec;
+use Fennec::Util::TBOverride;
 use Fennec::Runner;
 use Fennec::Workflow;
 
@@ -19,28 +20,32 @@ sub import {
     {
         no warnings 'redefine';
         no strict 'refs';
-        *{ $caller . '::finish' } = sub { $runner->finish }
+        *{ $caller . '::done_testing' } = sub { $runner->finish }
     }
-
-    my $workflow = Fennec::Workflow->new(
-        $caller,
-        method => sub { $Fennec::TEST_CLASS = $caller },
-        file => $file,
-    )->_build_as_root;
 
     $runner->add_finish_hook( sub {
         my $self = shift;
-        $self->process_workflow( $workflow );
+        $self->process_workflow(
+            $runner->_init_workflow( $caller )
+        );
     });
     $runner->reset_benchmark;
-
-    no warnings 'redefine';
-    *Fennec::Workflow::has_current = sub { 1 };
-    *Fennec::Workflow::current = sub { $workflow };
-    *Fennec::Workflow::depth = sub { 1 };
 }
 
 1;
+
+=head1 NAME
+
+Fennec::Standalone - Standalone Fennec test module
+
+=head1 DESCRIPTION
+
+Use this instead of L<Fennec> when writing standlone tests. Creates a runner,
+starts a root workflow, provides done_testing() to finish things up.
+
+=head1 SEE ALSO
+
+L<Fennec::Manual::Quickstart>
 
 =head1 AUTHORS
 

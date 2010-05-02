@@ -18,7 +18,6 @@ use Fennec::Util::Alias qw/
 
 use List::Util   qw/shuffle/;
 use Time::HiRes qw/time/;
-use Benchmark qw/timeit :hireswallclock/;
 
 Accessors qw/setups teardowns tests/;
 
@@ -47,9 +46,11 @@ sub run {
     return Result->skiparallel_testset( $self, $self->skip )
         if $self->skip;
 
-    $self->run_setups;
-    $self->run_tests;
+    $self->run_setups || return;
+    my $ok = eval { $self->run_tests; 1 };
+    my $msg = $@;
     $self->run_teardowns;
+    return $ok || die ( $@ );
 }
 
 sub add_testset {
@@ -79,7 +80,10 @@ sub add_teardown {
 sub run_setups {
     my $self = shift;
     return unless my $setups = $self->setups;
-    $_->run for @$setups;
+    for my $setup ( @$setups ) {
+        return unless $setup->run
+    }
+    return 1;
 }
 
 sub run_tests {
@@ -95,14 +99,16 @@ sub run_tests {
         @sets = sort { $a->name cmp $b->name } @sets
             if $self->testfile->fennec_meta->sort;
 
-        my $benchmark = timeit( 1, sub {
-            for my $set ( @sets ) {
-                $set->run()
-            }
-        });
-        Result->pass_testset( $self, $benchmark ) unless $self->no_result;
+        my $start = time;
+        for my $set ( @sets ) {
+            $set->run()
+        }
+        my $end = time;
+        Result->pass_testset( $self, [($end - $start)]) unless $self->no_result;
     }
     catch {
+        return Result->skip_testset( $self, $1 )
+            if ( m/SKIP:\s+(.*)/ );
         Result->fail_testset( $self, $_ );
     };
 }

@@ -4,18 +4,33 @@ use warnings;
 use Carp;
 
 use base 'Fennec::Handler';
+use Fennec::Util::Alias qw/
+    Fennec::Runner
+    Fennec::FileLoader
+/;
+
+use Fennec::Util::Accessors;
+Accessors qw/outhandle/;
 
 sub init {
     my $self = shift;
 
-    $self->{ out_std } ||= sub { print STDOUT "$_\n" for @_ };
+    # Force STDOUT to STDERR unless we generate it
+    open my $stdout, ">&STDOUT" or die "Can't duplicate STDOUT: $!";
+    close STDOUT;
+    open STDOUT, ">&", \*STDERR or die "Can't redirect STDOUT to STDERR";
+    $self->outhandle( $stdout );
+
+    $self->{ out_std } ||= sub { print $stdout "$_\n" for @_ };
 
     my $harness = $ENV{HARNESS_ACTIVE};
     my $verbose = $ENV{HARNESS_IS_VERBOSE};
+
     # If we have a non-verbose harness then output the errors to STDERR so that
     # they are seen. Outside of a harness, or in verbose mode the error output
     # is sent to STDOUT so that the error message appear at or near the result
     # that generated them.
+
     if ( $harness && !$verbose ) {
         $self->{ out_err } ||= sub { print STDERR "$_\n" for @_ };
     }
@@ -27,20 +42,40 @@ sub init {
 sub handle {
     my $self = shift;
     my ( $item ) = @_;
+
     unless ( $item ) {
         carp "No item";
         return;
     }
+
     return $self->result( $item ) if $item->isa( 'Fennec::Output::Result' );
-    if ( $item->isa( 'Fennec::Output::Diag' )) {
+
+    if ( $item->isa( 'Fennec::Output::Diag' ) || $item->isa( 'Fennec::Output::Note' )) {
         $self->stderr( @{ $item->stderr }) if $item->stderr;
-        if ( $item->stdout ) {
-            $self->stdout( @{ $item->stdout });
-            warn "Diag with stdout is deprecated\n";
-        }
+        $self->stdout( @{ $item->stdout }) if $item->stdout;
         return;
     }
+    elsif ( $item->isa( 'Fennec::Output::BailOut' )) {
+        $self->stderr( @{ $item->stderr }) if $item->stderr;
+        $self->_output( 'out_std', "Bail out!" );
+        return;
+    }
+
     warn "Unhandled output type: $item";
+}
+
+sub starting_file {
+    my $self = shift;
+    my ( $filename ) = @_;
+
+    my $root = FileLoader->root;
+    $filename =~ s|^$root/?||;
+
+    my $n = $self->_file_count;
+    my $t = @{ Runner->files };
+
+    $self->_output( 'out_std', "\nStarting file ($n/$t) $filename" );
+    $self->_output( 'out_std', '-' x 40 );
 }
 
 sub result {
@@ -70,23 +105,29 @@ sub stderr {
 
 sub finish {
     my $self = shift;
-    $self->_output( 'out_std', '1..' . ($self->_count - 1));
+    $self->_output( 'out_std', '1..' . ($self->_test_count - 1));
 }
 
 sub fennec_error {
     my $self = shift;
     $self->_output(
         'out_std',
-        "not ok " . $self->_count . " - Fennec Internal error"
+        "not ok " . $self->_test_count . " - Fennec Internal error"
     );
     $self->stderr( $_ ) for ( @_ );
 }
 
-sub _count {
+sub _test_count {
     my $self = shift;
     $self->{ count } ||= 1;
     my $num = $self->{ count }++;
     sprintf( "%.4d", $num );
+}
+
+sub _file_count {
+    my $self = shift;
+    $self->{ fcount } ||= 1;
+    return $self->{ fcount }++;
 }
 
 sub _output {
@@ -143,7 +184,7 @@ sub _result_line {
     my ( $result ) = @_;
 
     my $status = $self->_status( $result );
-    my $count = $self->_count;
+    my $count = $self->_test_count;
     my $benchmark = $self->_benchmark( $result->benchmark );
     my $name = $result->name || "[UNNAMED TEST]";
     my $postfix = $self->_postfix( $result );

@@ -12,6 +12,7 @@ use Fennec::Util::Alias qw/
     Fennec::TestSet
     Fennec::Output::Result
     Fennec::Output::Diag
+    Fennec::Assert
 /;
 
 use Fennec::Util::Accessors;
@@ -19,19 +20,14 @@ use Try::Tiny;
 use Carp;
 
 use Time::HiRes       qw/time/;
-use Benchmark         qw/timeit :hireswallclock/;
 use Scalar::Util      qw/blessed/;
 use List::Util        qw/shuffle/;
 use Exporter::Declare qw/:extend/;
 
-Accessors qw/ parent _testsets _workflows /;
+Accessors qw/ parent _testsets _workflows built /;
 
 our @BUILD_HOOKS;
 
-sub alias       { current() }
-sub has_current { 0 }
-sub current     { confess "No current worflow" }
-sub depth       { 0 }
 sub proto       {( _testsets => [], _workflows => [] )}
 sub build_hooks { @BUILD_HOOKS }
 
@@ -53,7 +49,7 @@ export build_with => sub {
     $build ||= $class;
 
     $class->export( $name, sub {
-        Fennec::Workflow->current->add_item(
+        caller->fennec_meta->workflow->add_item(
             $build->new( @_ )
         );
     });
@@ -73,34 +69,53 @@ sub import {
         unless grep { $_ eq $class } @{ $caller . '::ISA' };
 }
 
+sub run_build_hooks {
+    my $self = shift;
+    my $success = 1;
+    try {
+        $self->run_sub_as_current( $_, $self )
+            for $self->build_hooks();
+    }
+    catch {
+        $success = 0;
+        Result->new(
+            pass => 0,
+            file => $self->file || "unknown file",
+            name => "Build Hooks",
+            stderr => [ $_ ],
+        )->write;
+    };
+    return $success;
+}
+
 sub run_tests {
     my $self = shift;
-        try {
-            my @sets = $self->testsets;
-            $_->observed( 1 ) for @sets;
+    try {
+        my @sets = $self->testsets;
+        $_->observed( 1 ) for @sets;
 
-            if ( Runner->search ) {
-                @sets = $self->search_filter( Runner->search, \@sets );
-            }
-
-            @sets = shuffle @sets if $self->testfile->fennec_meta->random;
-            @sets = sort { $a->name cmp $b->name } @sets
-                if $self->testfile->fennec_meta->sort;
-
-            my $benchmark = timeit( 1, sub {
-                for my $set ( @sets ) {
-                    $self->testfile->fennec_meta->threader->run(sub {
-                        Runner->reset_benchmark;
-                        $set->run()
-                    });
-                }
-                $self->testfile->fennec_meta->threader->finish
-            });
-            Result->pass_workflow( $self, $benchmark );
+        if ( Runner->search ) {
+            @sets = $self->search_filter( Runner->search, \@sets );
         }
-        catch {
-            Result->fail_workflow( $self, $_ );
-        };
+
+        @sets = shuffle @sets if $self->testfile->fennec_meta->random;
+        @sets = sort { $a->name cmp $b->name } @sets
+            if $self->testfile->fennec_meta->sort;
+
+        my $start = time;
+        for my $set ( @sets ) {
+            $self->testfile->fennec_meta->threader->run(sub {
+                Runner->reset_benchmark;
+                $set->run()
+            });
+        }
+        $self->testfile->fennec_meta->threader->finish;
+        my $end = time;
+        Result->pass_workflow( $self, [($end - $start)] );
+    }
+    catch {
+        Result->fail_workflow( $self, $_ );
+    };
 }
 
 sub search_filter {
@@ -162,9 +177,24 @@ sub workflows {
 
 sub add_item {
     my $self = shift;
-    confess 'xxx' unless blessed( $self );
     my ( $item ) = @_;
     my $type = blessed( $item );
+
+    if ( $self->built ) {
+        my %testcaller = Assert->test_caller;
+        die "Attempt to add '$type("
+            . ($item->can( 'name' ) ? $item->name : "unnamed" )
+            . ")' to workflow '"
+            . $self->name
+            . "' after the workflow has already been built.\n"
+            . "Did you try to define a workflow or testset inside a testset?\n"
+            . "File: "
+            . $testcaller{file}
+            . "\nLine: "
+            . $testcaller{line}
+            . "\n"
+    }
+
     croak( "Item must be a blessed Workflow or Testset object" )
         unless $type and $item->isa( 'Fennec::Base::Method' );
 
@@ -183,28 +213,18 @@ sub add_item {
 
 sub build {
     my $self = shift;
+    croak( "Workflow '" . $self->name . "' already built" )
+        if $self->built;
+
     if ( $self->skip ) {
         Result->skip_workflow( $self, $self->skip );
         return $self;
     }
+
     $self->run_method_as_current_on( $self->method, $self->testfile );
     $self->build_children;
-    return $self;
-}
 
-sub _build_as_root {
-    my $self = shift;
-    my $tclass = $self->run_method_as_current( $self->method );
-    my %args = Fennec->_test_class_args;
-    my $constructor = delete $args{ constructor };
-    $self->parent( $tclass->fennec_new(
-        constructor => $constructor,
-        meta => {
-            workflow => $self,
-            file => $self->file,
-            %args,
-        },
-    ));
+    $self->built( 1 );
     return $self;
 }
 
@@ -212,10 +232,6 @@ sub build_children {
     my $self = shift;
     $_->build for $self->workflows;
     return $self;
-}
-
-sub current_add_item {
-    shift->current->add_item( @_ );
 }
 
 sub add_items {
@@ -267,25 +283,41 @@ sub run_method_as_current {
 sub run_method_as_current_on {
     my $self = shift;
     my ( $method, $obj, @args ) = @_;
-    my $depth = $self->depth + 1;
-
-    no warnings 'redefine';
-    local *has_current = sub { 1 };
-    local *current = sub { $self };
-    local *depth = sub { $depth };
-    return $obj->$method( @args );
+    return $self->run_as_current( sub {
+        return $obj->$method( @args );
+    });
 }
 
 sub run_sub_as_current {
     my $self = shift;
     my ( $sub, @args ) = @_;
-    my $depth = $self->depth + 1;
+    return $self->run_as_current( sub {
+        return $sub->( @args );
+    });
+}
 
-    no warnings 'redefine';
-    local *has_current = sub { 1 };
-    local *current = sub { $self };
-    local *depth = sub { $depth };
-    return $sub->( @args );
+sub run_as_current {
+    my $self = shift;
+    my ( $sub ) = @_;
+
+    my $obj = $self->testfile;
+    my $depth = $obj->fennec_meta->push_workflow( $self );
+    my $want = wantarray;
+    my ( $out, @out );
+    try {
+        if ( $want ) {
+            @out = $sub->();
+        }
+        else {
+            $out = $sub->();
+        }
+    }
+    catch {
+        eval { $obj->fennec_meta->pop_workflow( $depth ) };
+        die( $_ );
+    };
+    $obj->fennec_meta->pop_workflow( $depth );
+    return $want ? @out : $out;
 }
 
 1;

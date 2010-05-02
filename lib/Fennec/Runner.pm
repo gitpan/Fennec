@@ -2,34 +2,26 @@ package Fennec::Runner;
 use strict;
 use warnings;
 
-use Fennec::Util::Alias qw/
-    Fennec::TestFile
-    Fennec::Collector
-    Fennec::Workflow
-/;
-
+use Fennec::Util::TBOverride;
 use Fennec::Util::Accessors;
 use Try::Tiny;
 use Parallel::Runner;
 use Carp;
-use Digest::MD5 qw/md5_hex/;
 
 use Fennec::Util::Alias qw/
-    Fennec::FileLoader
-    Fennec::Output::Result
     Fennec::Output::Diag
-    Fennec::Config
+    Fennec::Output::Result
     Fennec::Runner::Proto
 /;
 
-use List::Util qw/shuffle/;
+use Digest::MD5 qw/md5_hex/;
+use List::Util  qw/shuffle/;
 use Time::HiRes qw/time/;
-use Benchmark qw/timeit :hireswallclock/;
 
 Accessors qw/
     files parallel_files parallel_tests threader ignore random pid parent_pid
     collector search default_asserts default_workflows _benchmark_time seed
-    _started _finished finish_hooks
+    _started _finished finish_hooks bail_out root_workflow_class
 /;
 
 our $SINGLETON;
@@ -55,50 +47,79 @@ sub run_tests {
     $self->start;
 
     for my $file ( @{ $self->files }) {
+        $self->collector->starting_file( $file->filename );
+
         srand( $self->seed );
         $self->threader->run( sub {
-            try {
-                $self->reset_benchmark;
-                my $workflow = Fennec::Workflow->new(
-                    $file->filename,
-                    method => sub { shift->file->load },
-                    file => $file,
-                )->_build_as_root;
-
-                $self->process_workflow( $workflow );
-            }
-            catch {
-                Result->fail_testfile( $file, $_ );
-            };
+            $self->_test_thread( $file );
         }, 1 );
     }
 
     $self->finish;
 }
 
+sub _test_thread {
+    my $self = shift;
+    my ( $file ) = @_;
+
+    try {
+        $self->process_workflow(
+            $self->_init_workflow(
+                $self->_init_file( $file )
+            )
+        );
+    }
+    catch {
+        if ( $_ =~ m/SKIP:\s*(.*)/ ) {
+            Result->new(
+                pass => 0,
+                skip => $1,
+                file => $file->filename || "unknown file",
+                name => $file->filename || "unknown file",
+            )->write;
+        }
+        else {
+            Result->new(
+                pass => 0,
+                file => $file->filename || "unknown file",
+                name => $file->filename || "unknown file",
+                stderr => [ $_ ],
+            )->write;
+        }
+    };
+}
+
+sub _init_file {
+    my $self = shift;
+    my ( $file ) = @_;
+    $self->reset_benchmark;
+
+    return $file->load;
+}
+
+sub _init_workflow {
+    my $self = shift;
+    my ( $tclass ) = @_;
+    my $test = $tclass->fennec_new;
+    $test->fennec_meta->root_workflow->parent( $test );
+    return $test->fennec_meta->root_workflow;
+}
+
 sub process_workflow {
     my $self = shift;
     my ( $workflow ) = @_;
 
-    $self->reset_benchmark;
-    try {
-        $workflow->run_sub_as_current( $_ )
-            for Fennec::Workflow->build_hooks();
-    }
-    catch {
-        Diag->new( "build_hook error: $_" )->write
-    };
+    $self->reset_benchmark();
+    return unless $workflow->run_build_hooks();
 
     my $testfile = $workflow->testfile;
     return Result->skip_workflow( $testfile )
         if $testfile->fennec_meta->skip;
 
     try {
-        $workflow->build_children;
-        my $benchmark = timeit( 1, sub {
-            $self->reset_benchmark;
-            $workflow->run_tests( $self->search )
-        });
+        $workflow->build;
+        $self->reset_benchmark;
+        $workflow->run_tests( $self->search )
     }
     catch {
         $testfile->fennec_meta->threader->finish;
@@ -109,8 +130,34 @@ sub process_workflow {
 sub start {
     my $self = shift;
     $self->collector->start;
-    $self->threader->iteration_callback( sub { $self->collector->cull });
+    $self->threader->iteration_callback( sub {
+        $self->collector->handle_output;
+        return unless $self->bail_out;
+        $self->threader->killall(15)
+    });
+    $self->threader->reap_callback( \&_reap_callback );
     $self->_started(1);
+    Diag->new(
+        stderr => [
+            "** Reproduce this test order with this environment variable:",
+            "** FENNEC_SEED='@{[ $self->seed ]}'",
+        ],
+    )->write;
+}
+
+sub _reap_callback {
+    my ( $status, $pid, $ret ) = @_;
+    Result->new(
+        pass => 0,
+        name => "Child exit",
+        stderr => [ "Child ($pid) exited with non-zero status(@{[$status >> 8]})!" ],
+    )->write if $status;
+    Result->new(
+        pass => 0,
+        name => "Wait status",
+        stderr => [ "waitpid($pid) returned $ret!" ],
+    )->write if $pid != $ret;
+    return;
 }
 
 sub finish {
@@ -173,19 +220,9 @@ sub DESTROY {
     if( $self->_started && !$self->_finished ) {
         warn <<EOT;
 Runner never finished!
-Did you forget to run finish() in a standalone test file?
+Did you forget to run done_testing() in a standalone test file?
 EOT
     }
-    print STDERR <<EOT
-
-
-=====================================
-The ordering of this run can be reproduced using the seed: @{[ $self->seed ]}
-Example: \$ FENNEC_SEED='@{[ $self->seed ]}' prove -I lib t/Fennec.t
-=====================================
-
-
-EOT
 }
 
 1;

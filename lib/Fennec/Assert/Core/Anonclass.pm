@@ -16,17 +16,22 @@ util anonclass => sub {
     my $tail = $ANON_PKG++;
     my $pkg = 'Fennec::Assert::Core::Anonclass::__ANON__::' . $tail;
     $INC{ "Fennec/Assert/Core/Anonclass/__ANON__/$tail.pm" } = __FILE__;
+
     no strict 'refs';
     push @{ $pkg . '::ISA' } => ___as_list( $proto{ isa })
         if $proto{ isa };
+
     Fennec::Util::Accessors->build_accessors( $pkg, @{ $proto{ accessors }});
+
     for my $sub ( keys %{ $proto{ subs }}) {
         my $code = $proto{ subs }->{ $sub };
         *{ $pkg . '::' . $sub } = $code;
     }
+
     for my $load ( ___as_list( $proto{ use })) {
         eval "package $pkg; use $load; 1" || die( $@ );
     }
+
     Fennec::Assert::Core->export_to( $pkg );
     return bless( \$pkg, __PACKAGE__ );
 };
@@ -76,6 +81,78 @@ sub DESTROY {
 }
 
 1;
+
+=head1 NAME
+
+Fennec::Assert::Core::Anonclass - Easily build a temporary class
+
+=head1 DESCRIPTION
+
+Sometimes you need a class that uses a module or implements some functionality
+in order to test another module. This provides a simple way to do that.
+
+=head1 SYNOPSIS
+
+    use Fennec::Assert::Core::Anonclass;
+
+    my $anonclass = anonclass(
+        use => $package || \@packages
+        isa => $base || \@bases,
+        accessors => \@accessor_names,
+        subs => {
+            name => sub { ... },
+            ...
+        },
+    );
+
+    # can() and isa() check against the anonymous class, not the
+    # Fennec::Assert::Core::Anonclass package.
+    ok( $anonclass->can( ... ));
+    ok( $anonclass->isa( ... ));
+
+    # You can instanciate your class
+    my $instance = $anonclass->new( ... );
+
+    # You can use all core testing functions as methods on your object
+    $instance->is_deeply( $want, $name );
+    $instance->can_ok( @list );
+    $instance->isa_ok( $base );
+
+    1;
+
+=head1 SCOPE WARNING
+
+The anonymous class will be destroyed when the $anonclass object and all
+instances fall out of scope. This will most likely never be a problem, but it
+is important to know.
+
+=head1 CLASS METHODS
+
+=over 4
+
+=item $instance = $anonclass->new( ... )
+
+Create a new instance of the anonymous class. Will call any new() method
+provided during anonclass construction, otherwise will bless a hashref
+containing any params provided.
+
+=item $subref = $anonclass->can( $name )
+
+can() on an anonclass object will act against the blessed anonymous class, not
+against the anonclass package.
+
+=item $bool = $anonclass->isa( $package )
+
+isa() on an anonclass object will act against the blessed anonymous class, not
+against the anonclass package.
+
+=item $package = $anonclass->class()
+
+Return the full package name of the anonymous class. This will be a strange
+looking package name with seemingly random characters at the end, but it is
+valid until the anonclass object is destroyed.
+
+=back
 
 =head1 AUTHORS
 
