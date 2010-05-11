@@ -1,5 +1,5 @@
 ---
-abstract: 'Framework upon which intercompatible testing solutions can be built.'
+abstract: 'Full Featured Testing Toolbox And Development Kit'
 author:
   - 'Chad Granum <exodist7@gmail.com>'
 configure_requires:
@@ -18,7 +18,7 @@ no_index:
 provides:
   Fennec:
     file: lib/Fennec.pm
-    version: 0.018
+    version: 0.019
   Fennec::Assert:
     file: lib/Fennec/Assert.pm
   Fennec::Assert::Core:
@@ -79,6 +79,8 @@ provides:
     file: lib/Fennec/Output/Note.pm
   Fennec::Output::Result:
     file: lib/Fennec/Output/Result.pm
+  Fennec::Parser:
+    file: lib/Fennec/Parser.pm
   Fennec::Runner:
     file: lib/Fennec/Runner.pm
   Fennec::Runner::Proto:
@@ -105,6 +107,8 @@ provides:
     file: lib/Fennec/Util/Alias.pm
   Fennec::Util::PackageFinder:
     file: lib/Fennec/Util/PackageFinder.pm
+  Fennec::Util::Sub:
+    file: lib/Fennec/Util/Sub.pm
   Fennec::Util::TBOverride:
     file: lib/Fennec/Util/TBOverride.pm
   Fennec::Workflow:
@@ -122,7 +126,7 @@ requires:
   Cwd: 0
   Data::Dumper: 0
   Digest::MD5: 0
-  Exporter::Declare: 0.003
+  Exporter::Declare: 0.012
   File::Temp: 0
   List::MoreUtils: 0
   List::Util: 0
@@ -134,4 +138,4 @@ resources:
   bugtracker: http://github.com/exodist/Fennec/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/exodist/Fennec
-version: 0.018
+version: 0.019

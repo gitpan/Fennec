@@ -36,9 +36,10 @@ lib/Fennec/Manual/CommandLine.pod
 lib/Fennec/Manual/Files.pod
 lib/Fennec/Manual/Handlers.pod
 lib/Fennec/Manual/Mission.pod
-lib/Fennec/Manual/Quickstart.pod
 lib/Fennec/Manual/Running.pod
+lib/Fennec/Manual/Standalone.pod
 lib/Fennec/Manual/TBAssertions.pod
+lib/Fennec/Manual/Tests.pod
 lib/Fennec/Manual/TestSuite.pod
 lib/Fennec/Manual/Vim.pod
 lib/Fennec/Manual/Workflows.pod
@@ -47,6 +48,7 @@ lib/Fennec/Output/BailOut.pm
 lib/Fennec/Output/Diag.pm
 lib/Fennec/Output/Note.pm
 lib/Fennec/Output/Result.pm
+lib/Fennec/Parser.pm
 lib/Fennec/Runner.pm
 lib/Fennec/Runner/.keep
 lib/Fennec/Runner/Proto.pm
@@ -62,6 +64,7 @@ lib/Fennec/Util/Abstract.pm
 lib/Fennec/Util/Accessors.pm
 lib/Fennec/Util/Alias.pm
 lib/Fennec/Util/PackageFinder.pm
+lib/Fennec/Util/Sub.pm
 lib/Fennec/Util/TBOverride.pm
 lib/Fennec/Workflow.pm
 lib/Fennec/Workflow/.keep
@@ -117,6 +120,7 @@ t/Fennec/Output/BailOut.pm
 t/Fennec/Output/Diag.pm
 t/Fennec/Output/Note.pm
 t/Fennec/Output/Result.pm
+t/Fennec/Parser.pm
 t/Fennec/Runner.pm
 t/Fennec/Runner/Proto.pm
 t/Fennec/Standalone.pm
@@ -131,11 +135,14 @@ t/Fennec/Util/Abstract.pm
 t/Fennec/Util/Accessors.pm
 t/Fennec/Util/Alias.pm
 t/Fennec/Util/PackageFinder.pm
+t/Fennec/Util/Sub.pm
+t/Fennec/Util/TBOverride.pm
 t/Fennec/Workflow.pm
 t/Fennec/Workflow/Case.pm
 t/Fennec/Workflow/Methods.pm
 t/Fennec/Workflow/Spec.pm
 t/Pod.pm
+t/RunByLine.pm
 t/Standalone-core.t
 t/Standalone-methods.t
 t/Standalone.t

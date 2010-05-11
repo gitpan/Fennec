@@ -14,8 +14,9 @@ use Fennec::Util::TBOverride;
 use Carp qw/confess croak carp cluck/;
 use Scalar::Util 'blessed';
 use Exporter::Declare ':extend';
+use Fennec::Util qw/test_caller/;
 
-our @EXPORT = qw/tb_wrapper tester util result diag test_caller note/;
+our @EXPORT = qw/tb_wrapper result diag test_caller note/;
 our @CARP_NOT = qw/ Try::Tiny Benchmark /;
 
 our $TB_RESULT;
@@ -23,13 +24,14 @@ our @TB_DIAGS;
 our @TB_NOTES;
 our $TB_OK = 0;
 
+export util export;
 sub util { goto &export }
 
 sub _name_sub_and_assert_class_from_args {
     my ( $name, $sub, $assert_class );
 
     $sub = pop( @_ ) if ref( $_[-1] ) && ref( $_[-1] ) eq 'CODE';
-    $assert_class = shift( @_ ) if @_ > 1;
+    $assert_class = shift( @_ ) if @_ > 1 && defined( $_[1] );
     ( $name ) = @_;
     $assert_class = blessed( $assert_class ) || $assert_class || caller(1);
     $sub ||= $assert_class->can( $name );
@@ -40,6 +42,7 @@ sub _name_sub_and_assert_class_from_args {
     );
 }
 
+export tester export;
 sub tester {
     my ( $name, $sub, $assert_class ) = _name_sub_and_assert_class_from_args( @_ );
     croak( "No code found in '$assert_class' for exported sub '$name'" )
@@ -64,7 +67,7 @@ sub tester {
 
     $assert_class->export(
         $name,
-        wrap_with_proto( $wrapsub, prototype( $sub ))
+        _wrap_with_proto( $wrapsub, prototype( $sub ))
     );
 }
 
@@ -155,24 +158,10 @@ sub tb_wrapper(&) {
             stdout    => \@Fennec::Assert::TB_NOTES,
         );
     };
-    return wrap_with_proto( $wrapper, prototype( $orig ));
+    return _wrap_with_proto( $wrapper, prototype( $orig ));
 }
 
-sub test_caller {
-    my $current = 1;
-    my ( $caller, $file, $line );
-    do {
-        ( $caller, $file, $line ) = caller( $current );
-        $current++;
-    } while $caller && !$caller->isa( 'Fennec::TestFile' );
-
-    return (
-        file => $file || "N/A",
-        line => $line || "N/A",
-    );
-}
-
-sub wrap_with_proto {
+sub _wrap_with_proto {
     my ( $sub, $proto ) = @_;
     return $sub unless $proto;
     return eval "sub($proto) { \$sub->( \@_ )}"
@@ -190,11 +179,6 @@ B<The synopsys and most of the other usage documentation has been moved, this
 doc has been reduced to API documentation.>
 
 L<Fennec::Manual::Assertions>
-
-=head1 EXPORTED FUNCTIONS
-
-Note: These also work in method form, if your assert class can be instantiated
-as an object you can call $instance->NAME().
 
 =over 4
 
@@ -288,11 +272,6 @@ L<Fennec::Assert> itself then @ISA will be modified to subclass the calling
 package. Assert subclasses do not modify the @ISA whent hey are used.
 
 =back
-
-=head1 EARLY VERSION WARNING
-
-L<Fennec> is still under active development, many features are untested or even
-unimplemented. Please give it a try and report any bugs or suggestions.
 
 =head1 MANUAL
 

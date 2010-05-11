@@ -1,7 +1,7 @@
 ---- config
 # Basic config options.
 title: Modern perl testing with Fennec
-indent: 5
+indent: 0
 height: 34
 width: 100
 skip: 0
@@ -44,13 +44,170 @@ by Chad 'Exodist' Granum
 
  * Test Grouping
 
- * Result output formatting
+ * Result Handling (output)
 
- * A versatile runner
+ * A Versatile Runner
 
  * Test File Types (finding test files)
 
  * Parallelization
+
+---- center
+
+Simple Fennec Example
+
+---- perl
+package TEST::MyTest;
+use strict;
+use warnings;
+use Fennec;
+
+# If the module specified is not installed all tests will be skipped
+use_or_skip 'Module::Name';
+
+# Traditional script style works fine
+ok( 1, "Not grouped" );
+is( 'a', 'a', "" );
+
+#It is much better to put tests into parallelizable groups.
+tests hello_world_group => sub {
+    my $self = shift;
+    ok( 1, "Hello world" );
+};
+
+1;
+
+---- Center
+
+THE QUICK AND DIRTY FENNEC PITCH
+
+
+
+
+
+
+
+Fennec comes with everything the common Test::Builder tools provide and more.
+
+---- perl
+# Compare:
+
+    # Group A
+    #######
+    ok( 1, "1 is true!" );
+    ok( 2, "2 is too!" );
+    ######
+
+    # VS
+
+    tests 'Group A' => sub {
+        ok( 1, "1 is true!" );
+        ok( 2, "2 is too!" );
+    };
+
+__END__
+
+ * Usually you group similar tests together anyway, why not isolate them?
+
+ * Doing this also allows you to run groups in parallel
+
+ * You can also run only the group on which you are currently working.
+
+---- perl
+    describe 'Workflow' => sub {
+        my $self = shift;
+
+        before_each { $self->do_something };
+
+        it { ok( 1, "1 is true!" ) };
+        it { ok( 2, "2 is true!" ) };
+
+        after_each { $self->do_something_else };
+
+        # Nested!
+        describe { ... };
+    };
+
+    cases {
+        my $var;
+        case { $var = 1 };
+        case { $var = 2 };
+
+        tests { ok( $var, "var is true" ) };
+        tests { ok( is_prime($var), "var is prime" )};
+    }
+
+__END__
+
+Handy workflows to make testing tasks easier
+
+ * These workflows come with Fennec
+
+ * It is also fairly easy to use the Fennec framework to write custom workflows.
+
+----
+== Running subsets of tests
+
+These commands can be used to run a subset of tests within a specified test
+file:
+
+    $ FENNEC_ITEM="item name" FENNEC_FILE="Filename" prove -I lib -v t/Fennec.t
+
+    $ FENNEC_ITEM="line number" FENNEC_FILE="Filename" prove -I lib -v t/Fennec.t
+
+ * You can specify a group or workflow name, or even a line number!
+
+ * Only that workflow or group will be run
+
+ * No waiting around for other tests before getting at what you care about.
+
+ * Line number can be any line number across which the workflow or group is defined.
+
+----
+== Object oriented test files
+
+ * All test groups and workflows are blessed methods.
+
+ * Your test file defines a package, which is initialized once
+
+ * All groups and workflows are run as methods on the same test object
+   (May be in different processes).
+
+----
+== Command line tools to make life easier
+
+Create t/Fennec.t with a good default config:
+
+    $ cd project_dir
+    $ fennec_init
+
++Create scaffold tests for every module in /lib
+
+    $ cd project_dir
+    $ fennec_scaffold
+
++Run a specific test file:
+
+    $ cd project_dir
+    $ fennec_prove t/MyModule.pm - [prove options]
+
++Run a specific test group by line number or name:
+
+    $ cd project_dir
+    $ fennec_prove t/MyModule.pm "My Group" [prove options]
+
+----
+== Test Randomization
+
+ * Test groups are run in random order by default.
+
+ * You can easily disable randomization if needed on a global or per test basis.
+
+ * Fennec prints out its random seed so you can reproduce the order if necessary.
+
+---- center
+
+Workflows
 
 ----
 == Limitations of a screwdriver
@@ -137,8 +294,207 @@ The workflow process:
   * Build workflows to depth
 
  * Get test sets from each workflow to depth
+   (Each workflow returns its own groups and the groups of its children)
 
- * Run test sets
+ * Run test sets (parallelizable)
+
+---- center
+
+Test files part I.
+
+----
+== Test files are objects
+
+ * All packages that 'use Fennec' are subclasses of Fennec::TestFile
+
++ * Meta Class - TEST::MyTest->fennec_meta()
+   * Root workflow
+   * Workflow stack
+   * Threader
+   * META data (todo, skip, file, sort, random)
+
++ * Construction - TEST::MyTest->fennec_new()
+   * Uses new() if your write your own, or use moose
+   * Blesses a hashref if their is no custom constructor
+     * Calls init() on the new object if you define it
+   * Initializes meta class
+
+---- center
+
+Assertions and test utilities
+
+----
+== Assertion Library management
+
+ * Every group and workflow generates a result
+   * Result passes if the method does not die
+   * Result fails if the method dies
+   * This allows for 'traditional asserts'
+
++ * Fennec::Assert - Custom assertions or tester functions
+   * Easily create libraries of functions similar to Test::More, etc.
+   * Automatically fills in result metadata such as:
+     * File name
+     * Line number
+
++ * Fennec::Util::TBOverride
+   * Defangs Test::Builder, forces it to report to Fennec
+   * Most Test::Builder tools 'just work' under fennec
+   * The most popular tools have been wrapped in Fennec::Assert::TBCore
+     * Wrapping Test::Builder tools encapsulates errors and results together
+
+---- center
+
+Grouping tests
+
+----
+== Test Grouping
+
+ * Tests are grouped into blessed methods
+
+ * Test groups are subclasses of Fennec::TestSet
+
+ * TestSets are what workflows produce
+
+ * Fennec provides a mechanism for you to isolate and run a specific testset
+
+ * TestSets can be run in parrallel
+
+---- perl
+
+tests 'Simple' => sub {
+    my $self = shift;
+    ok( 1, "Passing" );
+    ok( 0, "Failing" );
+};
+
+
+
+
+tests 'Complicated' => (
+    method => sub { ... },
+    # Only report a failure (die)
+    no_result => 1,
+    # Skip or todo an entire group
+    skip => $reason,
+    todo => $reason,
+);
+
+----
+== Fennec::TestSet::SubSet
+
+SubSet is the secret behind the SPEC and Case workflows.
+
+Properties:
+    * Tests     (TestSets)
+    * Setups    (methods)
+    * Teardowns (methods)
+
+ * Runs the setups in the order they were added
+ * Runs testsets after setups (usually randomized)
+ * Runs the teardowns in reverse order
+
+---- center
+
+Result handling
+
+(Output)
+
+----
+== Fennec::Handler
+
+ * Base class for custom output handers
+
+ * All output (results, diags, notes, etc) are passed to handlers
+
+ * Handlers run in, and remain in, the parent process
+
+ * Can run several at once
+
+ * Do anything you want with output objects
+
+----
+== Fennec::Handler::TAP
+
+Fennec provides a TAP handler
+
+ * prints outside the TAP handler are redirected to STDERR
+
+ * In a verbose harness (or no harness) errors (diag) appear directly below
+   failed results, not off in space.
+
+----
+== Custom Handlers
+
+ * Can record/report results in any format, XML, TAP, Custom
+
+ * Can filter results, such as only recording failures
+
+ * Send results to a server, database, or anywhere you please
+
+---- center
+
+The Runner
+
+----
+== Fennec::Runner
+
+ * Normally kicked off by t/Fennec.t
+   * Works with prove
+   * Can be configured per-project
+
+ * One runner, unlimited file types, workflows, etc.
+
+ * Parameters can be obtained from:
+   * Environment variables
+   * Config file (~/ or /etc/)
+   * Specified in Fennec.t
+   * Sane Defaults
+
+ * If you hate the idea of a runner you can use Fennec::Standalone
+   * Use .t extention
+   * No global runner
+   * Truely stands alone
+
+---- center
+
+File Types
+
+----
+== Fennec::FileType
+
+ * Specify the types of files to load in the runner
+
+ * Each Fennec::FileType::XXX must implement:
+
+   * $bool = $class->valid_file( $filename )
+
+   * $testclass = $class->load_file( $filename )
+
+   * @paths = $class->paths()
+
+  These 3 methods allow Fennec to work with almost any test file format you
+  can conceive.
+
+---- center
+
+Parallelization
+
+----
+== Parallelization
+
+ * Fennec can run files in parrallel
+   (forking in the runner)
+
+ * Fennec can run test groups in parrallel
+   (forking in the file subprocess)
+
+ * Fennec uses a 'Collector' to ensure results funnel down to the parent
+   process.
+
+---- center
+
+Example by conversion
 
 ---- perl
 == Here is a typical Test::Builder based test
@@ -204,7 +560,7 @@ done_testing;
 + * use Fennec instead of use Test::XXX
 
 ---- perl
-== Here is that same test converted to fennec
+== Here is that test again
 
 == t/MyModule.t
 #!/usr/bin/perl
@@ -272,6 +628,118 @@ tests 'Set values' => sub {
 
 + * Test groups are methods
   (notice: $self = shift; in the first group)
+
+---- center
+
+Examples
+
+---- perl
+package TEST::MyTest;
+use strict;
+use warnings;
+use Fennec;
+
+describe 'my group' => sub {
+    my $self = shift;
+
+    before_each { $self->load_data };
+    after_each { $self->unload_data };
+
+    # it is an alias to 'tests'
+    it 'my test' => sub {
+        my $self = shift;
+        ok( 1, 'spec test!' );
+    };
+
+    # Nested!
+    describe ...;
+};
+
+1;
+---- perl
+
+cases "Act the same in these cases" => sub {
+    my $self = shift;
+
+    case a => sub {
+        my $self = shift;
+        $self->reset_data( 'a' );
+    }
+    case b => sub {
+        my $self = shift;
+        $self->reset_data( 'b' );
+    }
+
+    tests a => sub {
+        my $self = shift;
+        ok( $self->have_data, "have data" );
+    }
+    tests b => sub {
+        my $self = shift;
+        ok( $self->works, "it works" );
+    }
+}
+
+---- perl
+sub setup_my_setup {
+    my $self = shift;
+    print "methods prefixed by setup_ will be run before tests defined as methods.";
+}
+
+sub test_method_as_test_by_prefix {
+    my $self = shift;
+    ok( 1, "methods prefixed by test_ will be run as method." );
+}
+
+sub teardown_my_teardown {
+    my $self = shift;
+    print "method prefixed by teardown_ will be run after tests defined as methods."
+}
+
+----
+== Testing Fennec Tools
+
+ * Test::Builder::Tester is painful
+
+Capturing and verifying formatted output is a mistake when your writing a tool
+that sits at a higher level.
+
+
+
+
++ * Fennec::Assert::Interceptor is pleasant
+   * Uses a collector stand-in to capture actual output objects
+
+Fennec tools can be tested using the Fennec Interceptor assertion library. It
+lets you capture all output generated in a codeblock. Unlike
+Test::Builder::Tester you don't parse output text. What you get is output
+objects.
+
+---- perl
+
+tests like => sub {
+    my $pass = capture {
+        like( 'abcd', qr/^abcd$/, 'full' );
+        like( 'efgh', qr/^efgh/, 'start' );
+        like( 'ijkl', qr/ijkl$/, 'end' );
+        like( 'abcd', 'abcd', 'string-not-regex' );
+    };
+
+    ok( $pass->[$_]->pass, "$_ passed" ) for 0 .. ( @$pass - 1 );
+
+    my $fail = capture {
+        like( 'abcd', qr/efgh/, 'fail' );
+        like( 'apple', qr/pear/, 'fail 2' );
+    };
+
+    ok( !$fail->[$_]->pass, "$_ failed" ) for 0 .. ( @$fail - 1 );
+    is( $fail->[0]->stderr->[0], "'abcd' does not match (?-xism:efgh)", "Correct error" );
+    is( $fail->[1]->stderr->[0], "'apple' does not match (?-xism:pear)", "Correct error" );
+};
+
+---- center
+
+Question and Answer time
 
 ----
 == The End

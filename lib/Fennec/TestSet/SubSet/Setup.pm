@@ -12,21 +12,15 @@ use Fennec::Util::Alias qw/
     Fennec::Output::Result
 /;
 
-Accessors qw/testfile/;
-
-sub lines_for_filter {
+sub run_on {
     my $self = shift;
-    B::svref_2object( $self->method )->START->line;
-}
-
-sub run {
-    my $self = shift;
+    my ( $on ) = @_;
     return try {
-        $self->run_on( $self->testfile );
+        $self->SUPER::run_on( $on );
         return 1;
     }
     catch {
-        die( $@ ) unless m/SKIP:\s*(.*)\s+at/;
+        die( $_ ) unless m/SKIP:\s*(.*)\s+at/;
         Result->skip_testset( $self, $1 );
         return 0;
     };
