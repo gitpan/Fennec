@@ -89,7 +89,7 @@ tests errors {
     my $msg = $@;
     like(
         $msg,
-        qr/You must provide a name to tests\(\) at \(eval \d+\) line 1/
+        qr/You must provide a name to tests\(\) at /
     );
 }
 

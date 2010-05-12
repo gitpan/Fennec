@@ -18,7 +18,7 @@ no_index:
 provides:
   Fennec:
     file: lib/Fennec.pm
-    version: 0.019
+    version: 0.020
   Fennec::Assert:
     file: lib/Fennec/Assert.pm
   Fennec::Assert::Core:
@@ -126,7 +126,7 @@ requires:
   Cwd: 0
   Data::Dumper: 0
   Digest::MD5: 0
-  Exporter::Declare: 0.012
+  Exporter::Declare: 0.014
   File::Temp: 0
   List::MoreUtils: 0
   List::Util: 0
@@ -138,4 +138,4 @@ resources:
   bugtracker: http://github.com/exodist/Fennec/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/exodist/Fennec
-version: 0.019
+version: 0.020
