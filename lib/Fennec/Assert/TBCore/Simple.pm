@@ -1,4 +1,7 @@
 package Fennec::Assert::TBCore::Simple;
+BEGIN {
+  $Fennec::Assert::TBCore::Simple::VERSION = '0.025';
+}
 use strict;
 use warnings;
 
@@ -29,6 +32,28 @@ Simply wraps L<Test::Simple> so that its functions work better in L<Fennec>.
 =over 4
 
 =item ok()
+
+=back
+
+=head1 MANUAL
+
+=over 2
+
+=item L<Fennec::Manual::Quickstart>
+
+The quick guide to using Fennec.
+
+=item L<Fennec::Manual::User>
+
+The extended guide to using Fennec.
+
+=item L<Fennec::Manual::Developer>
+
+The guide to developing and extending Fennec.
+
+=item L<Fennec::Manual>
+
+Documentation guide.
 
 =back
 

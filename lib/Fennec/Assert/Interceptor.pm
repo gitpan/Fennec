@@ -1,4 +1,7 @@
 package Fennec::Assert::Interceptor;
+BEGIN {
+  $Fennec::Assert::Interceptor::VERSION = '0.025';
+}
 use strict;
 use warnings;
 
@@ -124,6 +127,28 @@ Check the line number of a result.
 =item result_line_numbers_are( \@results, @lines )
 
 Check the line numbers of several results.
+
+=back
+
+=head1 MANUAL
+
+=over 2
+
+=item L<Fennec::Manual::Quickstart>
+
+The quick guide to using Fennec.
+
+=item L<Fennec::Manual::User>
+
+The extended guide to using Fennec.
+
+=item L<Fennec::Manual::Developer>
+
+The guide to developing and extending Fennec.
+
+=item L<Fennec::Manual>
+
+Documentation guide.
 
 =back
 

@@ -1,4 +1,7 @@
 package Fennec::Util::Alias;
+BEGIN {
+  $Fennec::Util::Alias::VERSION = '0.025';
+}
 use strict;
 use warnings;
 use Carp;
@@ -50,6 +53,32 @@ of the alias.
     Diag->new();
 
     1;
+
+=head1 MANUAL
+
+=over 2
+
+=item L<Fennec::Manual::Quickstart>
+
+The quick guide to using Fennec.
+
+=item L<Fennec::Manual::User>
+
+The extended guide to using Fennec.
+
+=item L<Fennec::Manual::Developer>
+
+The guide to developing and extending Fennec.
+
+=item L<Fennec::Manual>
+
+Documentation guide.
+
+=back
+
+=head1 AUTHORS
+
+Chad Granum L<exodist7@gmail.com>
 
 =head1 COPYRIGHT
 

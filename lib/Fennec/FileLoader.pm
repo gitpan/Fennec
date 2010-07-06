@@ -1,4 +1,7 @@
 package Fennec::FileLoader;
+BEGIN {
+  $Fennec::FileLoader::VERSION = '0.025';
+}
 use strict;
 use warnings;
 
@@ -101,6 +104,28 @@ filename.
 
 Returns a list of FileType objects for all the classes specified. Takes full
 class names.
+
+=back
+
+=head1 MANUAL
+
+=over 2
+
+=item L<Fennec::Manual::Quickstart>
+
+The quick guide to using Fennec.
+
+=item L<Fennec::Manual::User>
+
+The extended guide to using Fennec.
+
+=item L<Fennec::Manual::Developer>
+
+The guide to developing and extending Fennec.
+
+=item L<Fennec::Manual>
+
+Documentation guide.
 
 =back
 

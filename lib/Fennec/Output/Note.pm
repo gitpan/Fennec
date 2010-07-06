@@ -1,4 +1,7 @@
 package Fennec::Output::Note;
+BEGIN {
+  $Fennec::Output::Note::VERSION = '0.025';
+}
 use strict;
 use warnings;
 
@@ -23,6 +26,28 @@ See L<Fennec::Output>
 
     use Fennec::Output::Note;
     $note = Fennec::Output::Note->new( stdout => \@messages );
+
+=head1 MANUAL
+
+=over 2
+
+=item L<Fennec::Manual::Quickstart>
+
+The quick guide to using Fennec.
+
+=item L<Fennec::Manual::User>
+
+The extended guide to using Fennec.
+
+=item L<Fennec::Manual::Developer>
+
+The guide to developing and extending Fennec.
+
+=item L<Fennec::Manual>
+
+Documentation guide.
+
+=back
 
 =head1 AUTHORS
 

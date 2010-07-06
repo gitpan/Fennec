@@ -1,4 +1,7 @@
 package Fennec::Handler::TAP;
+BEGIN {
+  $Fennec::Handler::TAP::VERSION = '0.025';
+}
 use strict;
 use warnings;
 use Carp;
@@ -186,7 +189,18 @@ sub _result_line {
     my $status = $self->_status( $result );
     my $count = $self->_test_count;
     my $benchmark = $self->_benchmark( $result->benchmark );
-    my $name = $result->name || "[UNNAMED TEST]";
+    my $name = $result->name
+            || sprintf(
+                q{[UNNAMED TEST: %s line %s ]},
+
+                    $result->file
+                 || $result->workflow_stack
+                 || 'unknown file',
+
+                    $result->line
+                 || 'unknown'
+            );
+
     my $postfix = $self->_postfix( $result );
     my $out = join( ' ', $status, $count, $benchmark, '-', $name, $postfix );
 
@@ -217,6 +231,63 @@ sub _result_diag {
 }
 
 1;
+=head1 SYNOPSIS
+
+=head1 METHODS
+
+=head2 init
+
+=head2 handle
+
+=head2 starting_file
+
+=head2 result
+
+=head2 stdout
+
+=head2 stderr
+
+=head2 finish
+
+=head2 fennec_error
+
+=head2 _test_count
+
+=head2 _file_count
+
+=head2 _output
+
+=head2 _benchmark
+
+=head2 _status
+
+=head2 _postfix
+
+=head2 _result_line
+
+=head2 _result_diag
+
+=head1 MANUAL
+
+=over 2
+
+=item L<Fennec::Manual::Quickstart>
+
+The quick guide to using Fennec.
+
+=item L<Fennec::Manual::User>
+
+The extended guide to using Fennec.
+
+=item L<Fennec::Manual::Developer>
+
+The guide to developing and extending Fennec.
+
+=item L<Fennec::Manual>
+
+Documentation guide.
+
+=back
 
 =head1 AUTHORS
 

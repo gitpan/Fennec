@@ -1,130 +1,24 @@
 ---
-abstract: 'Full Featured Testing Toolbox And Development Kit'
+abstract: 'Workflow based testing framework for Perl.'
 author:
-  - 'Chad Granum <exodist7@gmail.com>'
+  - "Chad 'Exodist' Granum <exodist7@gmail.com>"
+build_requires:
+  Module::Build: 0.3601
 configure_requires:
-  Module::Build: 0.36
-generated_by: 'Module::Build version 0.3605'
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.101831, CPAN::Meta::Converter version 2.101610'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
 name: Fennec
-no_index:
-  namespace:
-    - Test::Builder
-  package:
-    - Test::Builder
-provides:
-  Fennec:
-    file: lib/Fennec.pm
-    version: 0.024
-  Fennec::Assert:
-    file: lib/Fennec/Assert.pm
-  Fennec::Assert::Core:
-    file: lib/Fennec/Assert/Core.pm
-  Fennec::Assert::Core::Anonclass:
-    file: lib/Fennec/Assert/Core/Anonclass.pm
-  Fennec::Assert::Core::Exception:
-    file: lib/Fennec/Assert/Core/Exception.pm
-  Fennec::Assert::Core::More:
-    file: lib/Fennec/Assert/Core/More.pm
-  Fennec::Assert::Core::Package:
-    file: lib/Fennec/Assert/Core/Package.pm
-  Fennec::Assert::Core::Simple:
-    file: lib/Fennec/Assert/Core/Simple.pm
-  Fennec::Assert::Core::Warn:
-    file: lib/Fennec/Assert/Core/Warn.pm
-  Fennec::Assert::Interceptor:
-    file: lib/Fennec/Assert/Interceptor.pm
-  Fennec::Assert::TBCore:
-    file: lib/Fennec/Assert/TBCore.pm
-  Fennec::Assert::TBCore::Exception:
-    file: lib/Fennec/Assert/TBCore/Exception.pm
-  Fennec::Assert::TBCore::More:
-    file: lib/Fennec/Assert/TBCore/More.pm
-  Fennec::Assert::TBCore::Simple:
-    file: lib/Fennec/Assert/TBCore/Simple.pm
-  Fennec::Assert::TBCore::Warn:
-    file: lib/Fennec/Assert/TBCore/Warn.pm
-  Fennec::Base::Method:
-    file: lib/Fennec/Base/Method.pm
-  Fennec::Collector:
-    file: lib/Fennec/Collector.pm
-  Fennec::Collector::Files:
-    file: lib/Fennec/Collector/Files.pm
-  Fennec::Collector::Interceptor:
-    file: lib/Fennec/Collector/Interceptor.pm
-  Fennec::Config:
-    file: lib/Fennec/Config.pm
-  Fennec::Debug:
-    file: lib/Fennec/Debug.pm
-  Fennec::FileLoader:
-    file: lib/Fennec/FileLoader.pm
-  Fennec::FileType:
-    file: lib/Fennec/FileType.pm
-  Fennec::FileType::Module:
-    file: lib/Fennec/FileType/Module.pm
-  Fennec::Handler:
-    file: lib/Fennec/Handler.pm
-  Fennec::Handler::TAP:
-    file: lib/Fennec/Handler/TAP.pm
-  Fennec::Output:
-    file: lib/Fennec/Output.pm
-  Fennec::Output::BailOut:
-    file: lib/Fennec/Output/BailOut.pm
-  Fennec::Output::Diag:
-    file: lib/Fennec/Output/Diag.pm
-  Fennec::Output::Note:
-    file: lib/Fennec/Output/Note.pm
-  Fennec::Output::Result:
-    file: lib/Fennec/Output/Result.pm
-  Fennec::Parser:
-    file: lib/Fennec/Parser.pm
-  Fennec::Runner:
-    file: lib/Fennec/Runner.pm
-  Fennec::Runner::Proto:
-    file: lib/Fennec/Runner/Proto.pm
-  Fennec::Standalone:
-    file: lib/Fennec/Standalone.pm
-  Fennec::TestFile:
-    file: lib/Fennec/TestFile.pm
-  Fennec::TestFile::Meta:
-    file: lib/Fennec/TestFile/Meta.pm
-  Fennec::TestSet:
-    file: lib/Fennec/TestSet.pm
-  Fennec::TestSet::SubSet:
-    file: lib/Fennec/TestSet/SubSet.pm
-  Fennec::TestSet::SubSet::Setup:
-    file: lib/Fennec/TestSet/SubSet/Setup.pm
-  Fennec::Util:
-    file: lib/Fennec/Util.pm
-  Fennec::Util::Abstract:
-    file: lib/Fennec/Util/Abstract.pm
-  Fennec::Util::Accessors:
-    file: lib/Fennec/Util/Accessors.pm
-  Fennec::Util::Alias:
-    file: lib/Fennec/Util/Alias.pm
-  Fennec::Util::PackageFinder:
-    file: lib/Fennec/Util/PackageFinder.pm
-  Fennec::Util::Sub:
-    file: lib/Fennec/Util/Sub.pm
-  Fennec::Util::TBOverride:
-    file: lib/Fennec/Util/TBOverride.pm
-  Fennec::Workflow:
-    file: lib/Fennec/Workflow.pm
-  Fennec::Workflow::Case:
-    file: lib/Fennec/Workflow/Case.pm
-  Fennec::Workflow::Methods:
-    file: lib/Fennec/Workflow/Methods.pm
-  Fennec::Workflow::Spec:
-    file: lib/Fennec/Workflow/Spec.pm
-  Test::Suite:
-    file: lib/Test/Suite.pm
 requires:
   Benchmark: 0
+  Carp::Always: 0
   Cwd: 0
   Data::Dumper: 0
+  Devel::CallerStack: 0
   Digest::MD5: 0
   Exporter::Declare: 0.016
   File::Temp: 0
@@ -134,8 +28,4 @@ requires:
   Scalar::Util: 0
   Time::HiRes: 0
   Try::Tiny: 0
-resources:
-  bugtracker: http://github.com/exodist/Fennec/issues
-  license: http://dev.perl.org/licenses/
-  repository: http://github.com/exodist/Fennec
-version: 0.024
+version: 0.025

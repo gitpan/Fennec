@@ -1,4 +1,7 @@
 package Fennec::Standalone;
+BEGIN {
+  $Fennec::Standalone::VERSION = '0.025';
+}
 use strict;
 use warnings;
 require Fennec;
@@ -73,12 +76,6 @@ Fennec::Standalone - Standalone Fennec test module
 Use this instead of L<Fennec> when writing standlone tests. Creates a runner,
 starts a root workflow, provides done_testing() to finish things up.
 
-=head1 HOWTO DOCUMENTATION
-
-L<Fennec::Manual::Standalone>
-
-How to write standalone tests.
-
 =head1 DEVELOPER API
 
 B<This documentation contains developer documentation for those wishing to
@@ -93,6 +90,28 @@ the functions exported by fennec to work in a standalone setting.
 
 You can specify arguments for the runner with runner => {...}. Any other
 arguments will be passed along to the L<Fennec> module.
+
+=back
+
+=head1 MANUAL
+
+=over 2
+
+=item L<Fennec::Manual::Quickstart>
+
+The quick guide to using Fennec.
+
+=item L<Fennec::Manual::User>
+
+The extended guide to using Fennec.
+
+=item L<Fennec::Manual::Developer>
+
+The guide to developing and extending Fennec.
+
+=item L<Fennec::Manual>
+
+Documentation guide.
 
 =back
 

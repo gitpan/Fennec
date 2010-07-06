@@ -1,4 +1,7 @@
 package Fennec::Assert::Core::Warn;
+BEGIN {
+  $Fennec::Assert::Core::Warn::VERSION = '0.025';
+}
 use strict;
 use warnings;
 
@@ -164,6 +167,28 @@ Check that the thrown warnings match the list of regexes.
 =item warnings_exist { ... } [ $string, $regex, ... ], $name
 
 Check that at least 1 warning matches for each string and regex provided.
+
+=back
+
+=head1 MANUAL
+
+=over 2
+
+=item L<Fennec::Manual::Quickstart>
+
+The quick guide to using Fennec.
+
+=item L<Fennec::Manual::User>
+
+The extended guide to using Fennec.
+
+=item L<Fennec::Manual::Developer>
+
+The guide to developing and extending Fennec.
+
+=item L<Fennec::Manual>
+
+Documentation guide.
 
 =back
 

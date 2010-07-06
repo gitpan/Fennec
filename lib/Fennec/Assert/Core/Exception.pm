@@ -1,4 +1,7 @@
 package Fennec::Assert::Core::Exception;
+BEGIN {
+  $Fennec::Assert::Core::Exception::VERSION = '0.025';
+}
 use strict;
 use warnings;
 
@@ -144,6 +147,28 @@ codeblock dies.
 Run a codeblock and check if it lives or dies. In array context will return a
 boolean, if the code died the error will also be returned. In scalar context
 only a boolean will be returned.
+
+=back
+
+=head1 MANUAL
+
+=over 2
+
+=item L<Fennec::Manual::Quickstart>
+
+The quick guide to using Fennec.
+
+=item L<Fennec::Manual::User>
+
+The extended guide to using Fennec.
+
+=item L<Fennec::Manual::Developer>
+
+The guide to developing and extending Fennec.
+
+=item L<Fennec::Manual>
+
+Documentation guide.
 
 =back
 

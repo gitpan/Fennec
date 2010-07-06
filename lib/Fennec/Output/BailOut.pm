@@ -1,4 +1,7 @@
 package Fennec::Output::BailOut;
+BEGIN {
+  $Fennec::Output::BailOut::VERSION = '0.025';
+}
 use strict;
 use warnings;
 
@@ -10,6 +13,33 @@ sub new {
 }
 
 1;
+=head1 SYNOPSIS
+
+=head1 METHODS
+
+=head2 new
+
+=head1 MANUAL
+
+=over 2
+
+=item L<Fennec::Manual::Quickstart>
+
+The quick guide to using Fennec.
+
+=item L<Fennec::Manual::User>
+
+The extended guide to using Fennec.
+
+=item L<Fennec::Manual::Developer>
+
+The guide to developing and extending Fennec.
+
+=item L<Fennec::Manual>
+
+Documentation guide.
+
+=back
 
 =head1 AUTHORS
 

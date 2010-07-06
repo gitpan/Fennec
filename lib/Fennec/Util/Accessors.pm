@@ -1,4 +1,7 @@
 package Fennec::Util::Accessors;
+BEGIN {
+  $Fennec::Util::Accessors::VERSION = '0.025';
+}
 use strict;
 use warnings;
 
@@ -83,6 +86,28 @@ Imports 'Accessors' into the callers namespace.
 
 Used by L<Fennec::Util::Alias> so that when using this package aliased the
 Accessors function behaves properly.
+
+=back
+
+=head1 MANUAL
+
+=over 2
+
+=item L<Fennec::Manual::Quickstart>
+
+The quick guide to using Fennec.
+
+=item L<Fennec::Manual::User>
+
+The extended guide to using Fennec.
+
+=item L<Fennec::Manual::Developer>
+
+The guide to developing and extending Fennec.
+
+=item L<Fennec::Manual>
+
+Documentation guide.
 
 =back
 

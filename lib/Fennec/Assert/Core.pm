@@ -1,4 +1,7 @@
 package Fennec::Assert::Core;
+BEGIN {
+  $Fennec::Assert::Core::VERSION = '0.025';
+}
 use strict;
 use warnings;
 
@@ -56,6 +59,28 @@ Loads all the following assertion libraries:
 
 Export all assertions to the specified package. An optional prefix may be
 appended to all assertion names.
+
+=back
+
+=head1 MANUAL
+
+=over 2
+
+=item L<Fennec::Manual::Quickstart>
+
+The quick guide to using Fennec.
+
+=item L<Fennec::Manual::User>
+
+The extended guide to using Fennec.
+
+=item L<Fennec::Manual::Developer>
+
+The guide to developing and extending Fennec.
+
+=item L<Fennec::Manual>
+
+Documentation guide.
 
 =back
 

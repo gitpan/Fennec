@@ -1,4 +1,7 @@
 package Fennec::Assert::TBCore::Exception;
+BEGIN {
+  $Fennec::Assert::TBCore::Exception::VERSION = '0.025';
+}
 use strict;
 use warnings;
 
@@ -35,6 +38,28 @@ Simply wraps L<Test::Exception> so that its functions work better in L<Fennec>.
 =item lives_ok()
 
 =item lives_and()
+
+=back
+
+=head1 MANUAL
+
+=over 2
+
+=item L<Fennec::Manual::Quickstart>
+
+The quick guide to using Fennec.
+
+=item L<Fennec::Manual::User>
+
+The extended guide to using Fennec.
+
+=item L<Fennec::Manual::Developer>
+
+The guide to developing and extending Fennec.
+
+=item L<Fennec::Manual>
+
+Documentation guide.
 
 =back
 

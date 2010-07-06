@@ -1,4 +1,7 @@
 package Fennec::FileType;
+BEGIN {
+  $Fennec::FileType::VERSION = '0.025';
+}
 use strict;
 use warnings;
 
@@ -132,6 +135,28 @@ Load the FileType object and return the class name of the TestFile class it
 produced.
 
 Only loads the file once.
+
+=back
+
+=head1 MANUAL
+
+=over 2
+
+=item L<Fennec::Manual::Quickstart>
+
+The quick guide to using Fennec.
+
+=item L<Fennec::Manual::User>
+
+The extended guide to using Fennec.
+
+=item L<Fennec::Manual::Developer>
+
+The guide to developing and extending Fennec.
+
+=item L<Fennec::Manual>
+
+Documentation guide.
 
 =back
 

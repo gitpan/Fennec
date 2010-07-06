@@ -1,4 +1,7 @@
 package Fennec;
+BEGIN {
+  $Fennec::VERSION = '0.025';
+}
 use strict;
 use warnings;
 
@@ -14,7 +17,6 @@ use Fennec::Util::Alias qw/
     Devel::Declare::Interface
 /;
 
-our $VERSION = "0.024";
 our @META_DATA = qw/todo skip random sort no_fork/;
 
 sub import {
@@ -166,21 +168,34 @@ sub _require_or_skip(*) {
 
 =head1 NAME
 
-Fennec - Full Featured Testing Toolbox And Development Kit
+Fennec - Workflow based testing framework for Perl.
 
 =head1 DESCRIPTION
 
-Fennec is a full featured testing toolbox. Fennec provides all the tools your
-used to, but in a framework that allows for greater interopability of third
-party tools. Along with the typical set of tools, Fennec addresses many common
-problems, complaints, and wish list items.
+Fennec is a workflow based testing framework for Perl. It is designed to be
+easy to use, easy to extend, and to provide an incredible array of tools while
+staying out of your way. Fennec provides everything your used to in Perl
+testing framework along with enhancements inspired from other frameworks.
 
-In addition to the provided tools, Fennec provides a solid framework and highly
-extendable API. Using Fennec you can write custom workflows, assertions,
-testers, and output plugins. You can even define custom file types and file
-loaders.
+Fennec works just like traiditional L<Test::Builder> tools in that it allows
+you to write script style tests. Fennec takes this a step further by
+introducing behavior driven development with the concepts of test groups and
+workflows. Fennec also requires that each test file define a class which Fennec
+will instantiate.
+
+Please see these docs for additional details:
+
+=over 2
+
+=item L<Fennec::Manual::Quickstart>
+
+=item L<Fennec::Manual::User>
+
+=back
 
 =head1 SYNOPSIS
+
+t/MyModule.t:
 
     package TEST::MyModule;
     use strict;
@@ -223,23 +238,27 @@ loaders.
         }
     }
 
-    1;
+    done_testing;
 
-=head1 FURTHER READING
+=head1 MANUAL
 
-=over 4
+=over 2
 
-=item L<Fennec::UserManual::Tests>
+=item L<Fennec::Manual::Quickstart>
 
-Primer on Fennec's core tools
+The quick guide to using Fennec.
 
-=item L<Fennec::UserManual::TestSuite>
+=item L<Fennec::Manual::User>
 
-Using Fennec as a runner to better manage your test suite.
+The extended guide to using Fennec.
 
-=item L<Fennec::UserManual::Standalone>
+=item L<Fennec::Manual::Developer>
 
-Writing standalone tests that exist isolated in .t files.
+The guide to developing and extending Fennec.
+
+=item L<Fennec::Manual>
+
+Documentation guide.
 
 =back
 
@@ -289,28 +308,6 @@ Fennec offers the following features, among others.
 
 L<Fennec::Mission> - Why does Fennec exist?
 
-=head1 USER DOCUMENTATION
-
-User documentation is for those who wish to use Fennec to write simple tests,
-or manage a test suite for a project.
-
-=over 4
-
-=item L<Fennec::UserManual>
-
-=back
-
-=head1 DEVELOPER DOCUMENTATION
-
-Developer documentation is for those who wish to extend Fennec, or contribute
-to overall Fennec development.
-
-=over 4
-
-=item L<Fennec::DeveloperManual>
-
-=back
-
 =head1 API DOCUMENTATION
 
 API Documentation covers object internals. See the POD within each individual
@@ -318,7 +315,7 @@ module.
 
 =head1 FENNEC MODULE API
 
-B<This section only covers the API for Fennec.pm. See L<Fennec::UserManual> and other
+B<This section only covers the API for Fennec.pm. See L<Fennec::Manual> and other
 documentation for other module API's.>
 
 B<This section is not for those who simply wish to write tests, this is for

@@ -1,4 +1,7 @@
 package Fennec::Assert;
+BEGIN {
+  $Fennec::Assert::VERSION = '0.025';
+}
 use strict;
 use warnings;
 
@@ -95,13 +98,14 @@ sub _process_wrapped_results {
         # Try to provide a minimum diag for failed tests that do not provide
         # their own.
         if ( !$outresult->{ pass } && !$outresult->{ stderr }) {
-            my @diag;
+            my @diag = ("Assertion arguments were:");
             $outresult->{ stderr } = \@diag;
             for my $i ( 0 .. (@$args - 1)) {
                 my $arg = $args->[$i];
-                $arg = 'undef' unless defined( $arg );
-                next if "$arg" eq $outresult->{ name } || "";
-                push @diag => "\$_[$i] = '$arg'";
+                next if defined $arg
+                     && "$arg" eq $outresult->{ name } || "";
+                $arg = defined( $arg ) ? "'$arg'" : 'undef';
+                push @diag => "\t$i: $arg";
             }
         }
 
@@ -133,10 +137,22 @@ sub result {
     my %proto = @_;
     my $res = Result->new(
         @proto{qw/file line/} ? () : test_caller(),
+        _current_conditions(),
         %proto,
     );
     $res->write;
     return $res->pass;
+}
+
+sub _current_conditions {
+    my $current = Fennec::TestSet->current;
+    return unless $current;
+    my %out;
+    $out{ todo } = $current->todo if $current->todo;
+    $out{ skip } = $current->skip if $current->skip;
+    $out{ workflow_stack } = [ Fennec::Util->workflow_stack( $current->workflow )];
+    $out{ testset_name } = $current->name;
+    return %out;
 }
 
 sub tb_wrapper(&) {
@@ -182,7 +198,7 @@ L<Fennec::Manual::Assertions>
 
 =over 4
 
-=item $newsub = tb_wrapper( sub { ... } )
+=item $newsub = tb_wrapper( sub { ... })
 
 =item $newsub = tb_wrapper( \&function_name )
 
@@ -273,32 +289,27 @@ package. Assert subclasses do not modify the @ISA whent hey are used.
 
 =back
 
-=head1 USER DOCUMENTATION
+=head1 MANUAL
 
-User documentation is for those who wish to use Fennec to write simple tests,
-or manage a test suite for a project.
+=over 2
 
-=over 4
+=item L<Fennec::Manual::Quickstart>
 
-=item L<Fennec::UserManual>
+The quick guide to using Fennec.
+
+=item L<Fennec::Manual::User>
+
+The extended guide to using Fennec.
+
+=item L<Fennec::Manual::Developer>
+
+The guide to developing and extending Fennec.
+
+=item L<Fennec::Manual>
+
+Documentation guide.
 
 =back
-
-=head1 DEVELOPER DOCUMENTATION
-
-Developer documentation is for those who wish to extend Fennec, or contribute
-to overall Fennec development.
-
-=over 4
-
-=item L<Fennec::DeveloperManual>
-
-=back
-
-=head1 API DOCUMENTATION
-
-API Documentation covers object internals. See the POD within each individual
-module.
 
 =head1 AUTHORS
 

@@ -1,4 +1,7 @@
 package Fennec::Collector::Files;
+BEGIN {
+  $Fennec::Collector::Files::VERSION = '0.025';
+}
 use strict;
 use warnings;
 
@@ -189,6 +192,28 @@ Finish the collector (Cleanup)
 =item $dir = $obj->testdir()
 
 Name of the tempdir that stores result files.
+
+=back
+
+=head1 MANUAL
+
+=over 2
+
+=item L<Fennec::Manual::Quickstart>
+
+The quick guide to using Fennec.
+
+=item L<Fennec::Manual::User>
+
+The extended guide to using Fennec.
+
+=item L<Fennec::Manual::Developer>
+
+The guide to developing and extending Fennec.
+
+=item L<Fennec::Manual>
+
+Documentation guide.
 
 =back
 

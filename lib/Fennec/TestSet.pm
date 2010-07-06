@@ -1,4 +1,7 @@
 package Fennec::TestSet;
+BEGIN {
+  $Fennec::TestSet::VERSION = '0.025';
+}
 use strict;
 use warnings;
 
@@ -19,6 +22,8 @@ use Fennec::Util::Alias qw/
 /;
 
 use Time::HiRes qw/time/;
+our $CURRENT;
+sub current { $CURRENT };
 
 Accessors qw/ workflow no_result observed created_in /;
 
@@ -45,6 +50,7 @@ sub run {
     return Result->skip_testset( $self, $self->skip )
         if $self->skip;
 
+    local $CURRENT = $self;
     try {
         my $start = time;
         $self->run_on( $self->testfile );
@@ -105,6 +111,28 @@ EOT
 }
 
 1;
+
+=head1 MANUAL
+
+=over 2
+
+=item L<Fennec::Manual::Quickstart>
+
+The quick guide to using Fennec.
+
+=item L<Fennec::Manual::User>
+
+The extended guide to using Fennec.
+
+=item L<Fennec::Manual::Developer>
+
+The guide to developing and extending Fennec.
+
+=item L<Fennec::Manual>
+
+Documentation guide.
+
+=back
 
 =head1 AUTHORS
 

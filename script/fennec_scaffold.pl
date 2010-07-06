@@ -7,17 +7,19 @@ use File::Path qw(make_path);
 
 our %MODULES;
 
+our $lib_dir = $ENV{FENNEC_LIB_DIR} || $ARGV[0] || './lib';
+
 find(
     sub {
         my $name = $File::Find::name;
         return unless $name =~ m/\.pm$/;
         $MODULES{ $name } = [ $File::Find::dir, $_ ];
     },
-    './lib'
+    $lib_dir
 );
 
 for my $item ( values %MODULES ) {
-    $item->[0] =~ s|^\./lib|./t|;
+    $item->[0] =~ s|^\Q$lib_dir\E|./t|;
     my $test = join( '/', @$item );
     next if -e $test;
     mktest( $item, $test );
@@ -34,9 +36,9 @@ use strict;
 use warnings;
 use Fennec;
 
-tests load => sub {
+tests load {
     require_ok( '$package' );
-};
+}
 
 1;
 EOT
@@ -51,3 +53,39 @@ sub file_to_package {
     $out =~ s|/+|::|g;
     return $out;
 }
+
+=head1 MANUAL
+
+=over 2
+
+=item L<Fennec::Manual::Quickstart>
+
+The quick guide to using Fennec.
+
+=item L<Fennec::Manual::User>
+
+The extended guide to using Fennec.
+
+=item L<Fennec::Manual::Developer>
+
+The guide to developing and extending Fennec.
+
+=item L<Fennec::Manual>
+
+Documentation guide.
+
+=back
+
+=head1 AUTHORS
+
+Chad Granum L<exodist7@gmail.com>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2010 Chad Granum
+
+Fennec is free software; Standard perl licence.
+
+Fennec is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the license for more details.

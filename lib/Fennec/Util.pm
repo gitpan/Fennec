@@ -1,4 +1,7 @@
 package Fennec::Util;
+BEGIN {
+  $Fennec::Util::VERSION = '0.025';
+}
 use strict;
 use warnings;
 
@@ -7,6 +10,7 @@ use base 'Exporter';
 our @EXPORT_OK = qw/test_caller/;
 
 use Carp qw/carp confess croak cluck/;
+use Devel::CallerStack qw/caller_stack/;
 
 sub workflow_stack {
     my $class = shift;
@@ -46,16 +50,13 @@ sub package_sub_map {
 }
 
 sub test_caller {
-    my $current = 1;
-    my ( $caller, $file, $line );
-    do {
-        ( $caller, $file, $line ) = caller( $current );
-        $current++;
-    } while $caller && !$caller->isa( 'Fennec::TestFile' );
-
+    my $stack = caller_stack;
+    $stack->filter( 'package', sub { shift->isa( 'Fennec::TestFile' )});
+    my $level = $stack->recent;
+    return unless $level;
     return (
-        file => $file || "N/A",
-        line => $line || "N/A",
+        file => $level->filename || "N/A",
+        line => $level->line || "N/A",
     );
 }
 
@@ -91,6 +92,28 @@ to filter the list.
 
 Get a map of (sub_name => $coderef) for all subs in a package. If a regex is
 provided use it to filter the list of subs.
+
+=back
+
+=head1 MANUAL
+
+=over 2
+
+=item L<Fennec::Manual::Quickstart>
+
+The quick guide to using Fennec.
+
+=item L<Fennec::Manual::User>
+
+The extended guide to using Fennec.
+
+=item L<Fennec::Manual::Developer>
+
+The guide to developing and extending Fennec.
+
+=item L<Fennec::Manual>
+
+Documentation guide.
 
 =back
 

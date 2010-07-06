@@ -1,4 +1,7 @@
 package Fennec::Assert::TBCore::Warn;
+BEGIN {
+  $Fennec::Assert::TBCore::Warn::VERSION = '0.025';
+}
 use strict;
 use warnings;
 
@@ -37,6 +40,28 @@ Simply wraps L<Test::Warn> so that its functions work better in L<Fennec>.
 =item warnings_like()
 
 =item warnings_exist()
+
+=back
+
+=head1 MANUAL
+
+=over 2
+
+=item L<Fennec::Manual::Quickstart>
+
+The quick guide to using Fennec.
+
+=item L<Fennec::Manual::User>
+
+The extended guide to using Fennec.
+
+=item L<Fennec::Manual::Developer>
+
+The guide to developing and extending Fennec.
+
+=item L<Fennec::Manual>
+
+Documentation guide.
 
 =back
 

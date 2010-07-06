@@ -1,4 +1,7 @@
 package Fennec::Output::Result;
+BEGIN {
+  $Fennec::Output::Result::VERSION = '0.025';
+}
 use strict;
 use warnings;
 
@@ -15,8 +18,8 @@ use Fennec::Util::Alias qw/
     Fennec::Runner
 /;
 
-our @ANY_ACCESSORS = qw/ skip todo name line/;
-our @SIMPLE_ACCESSORS = qw/ pass benchmark /;
+our @ANY_ACCESSORS = qw/ skip todo name line /;
+our @SIMPLE_ACCESSORS = qw/ pass benchmark finishes testset_name /;
 our @PROPERTIES = (
     @SIMPLE_ACCESSORS,
     @ANY_ACCESSORS,
@@ -117,6 +120,7 @@ for my $type ( qw/workflow testset/ ) {
             $type => $item,
             $item->can( 'name' ) ? ( name => $item->name ) : (),
             stderr => \@stderr,
+            finishes => $type,
         )->write;
     };
     my $pass = sub {
@@ -128,6 +132,7 @@ for my $type ( qw/workflow testset/ ) {
             name => $item->name,
             benchmark => $benchmark,
             stderr => \@stderr,
+            finishes => $type,
         )->write;
     };
     my $skip = sub {
@@ -140,6 +145,7 @@ for my $type ( qw/workflow testset/ ) {
             name => $item->name,
             skip => $reason,
             stderr => \@stderr,
+            finishes => $type,
         )->write;
     };
     no strict 'refs';
@@ -158,6 +164,28 @@ sub serialize {
 }
 
 1;
+
+=head1 MANUAL
+
+=over 2
+
+=item L<Fennec::Manual::Quickstart>
+
+The quick guide to using Fennec.
+
+=item L<Fennec::Manual::User>
+
+The extended guide to using Fennec.
+
+=item L<Fennec::Manual::Developer>
+
+The guide to developing and extending Fennec.
+
+=item L<Fennec::Manual>
+
+Documentation guide.
+
+=back
 
 =head1 AUTHORS
 

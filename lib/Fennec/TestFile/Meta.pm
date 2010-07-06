@@ -1,4 +1,7 @@
 package Fennec::TestFile::Meta;
+BEGIN {
+  $Fennec::TestFile::Meta::VERSION = '0.025';
+}
 use strict;
 use warnings;
 
@@ -184,6 +187,28 @@ Get the TestFile object.
 =item $sort = $obj->sort()
 
 True if the tests should be sorted instead of randomized.
+
+=back
+
+=head1 MANUAL
+
+=over 2
+
+=item L<Fennec::Manual::Quickstart>
+
+The quick guide to using Fennec.
+
+=item L<Fennec::Manual::User>
+
+The extended guide to using Fennec.
+
+=item L<Fennec::Manual::Developer>
+
+The guide to developing and extending Fennec.
+
+=item L<Fennec::Manual>
+
+Documentation guide.
 
 =back
 

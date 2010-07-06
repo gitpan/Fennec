@@ -1,4 +1,7 @@
 package Fennec::Base::Method;
+BEGIN {
+  $Fennec::Base::Method::VERSION = '0.025';
+}
 use strict;
 use warnings;
 
@@ -96,6 +99,28 @@ extended paramaters.
 
 Run the object as a method on the object specified as the first argument.
 Additional arguments are passed into the method invocation.
+
+=back
+
+=head1 MANUAL
+
+=over 2
+
+=item L<Fennec::Manual::Quickstart>
+
+The quick guide to using Fennec.
+
+=item L<Fennec::Manual::User>
+
+The extended guide to using Fennec.
+
+=item L<Fennec::Manual::Developer>
+
+The guide to developing and extending Fennec.
+
+=item L<Fennec::Manual>
+
+Documentation guide.
 
 =back
 
