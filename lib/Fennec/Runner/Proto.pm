@@ -1,6 +1,6 @@
 package Fennec::Runner::Proto;
 BEGIN {
-  $Fennec::Runner::Proto::VERSION = '0.025';
+  $Fennec::Runner::Proto::VERSION = '0.026';
 }
 use strict;
 use warnings;

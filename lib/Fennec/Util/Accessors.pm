@@ -1,6 +1,6 @@
 package Fennec::Util::Accessors;
 BEGIN {
-  $Fennec::Util::Accessors::VERSION = '0.025';
+  $Fennec::Util::Accessors::VERSION = '0.026';
 }
 use strict;
 use warnings;

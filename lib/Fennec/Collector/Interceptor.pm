@@ -1,6 +1,6 @@
 package Fennec::Collector::Interceptor;
 BEGIN {
-  $Fennec::Collector::Interceptor::VERSION = '0.025';
+  $Fennec::Collector::Interceptor::VERSION = '0.026';
 }
 use strict;
 use warnings;

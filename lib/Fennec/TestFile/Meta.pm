@@ -1,6 +1,6 @@
 package Fennec::TestFile::Meta;
 BEGIN {
-  $Fennec::TestFile::Meta::VERSION = '0.025';
+  $Fennec::TestFile::Meta::VERSION = '0.026';
 }
 use strict;
 use warnings;

@@ -1,6 +1,6 @@
 package Fennec::Assert::TBCore::Exception;
 BEGIN {
-  $Fennec::Assert::TBCore::Exception::VERSION = '0.025';
+  $Fennec::Assert::TBCore::Exception::VERSION = '0.026';
 }
 use strict;
 use warnings;
