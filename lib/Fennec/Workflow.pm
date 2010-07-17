@@ -1,6 +1,6 @@
 package Fennec::Workflow;
 BEGIN {
-  $Fennec::Workflow::VERSION = '0.026';
+  $Fennec::Workflow::VERSION = '0.027';
 }
 use strict;
 use warnings;
@@ -336,6 +336,21 @@ sub run_as_current {
     };
     $obj->fennec_meta->pop_workflow( $depth );
     return $want ? @out : $out;
+}
+
+sub clone {
+    my $self = shift;
+    my $class = blessed( $self );
+    my $data = { map {
+        my $item = $self->{ $_ };
+        $_ => ( blessed( $item ) && $item->can( 'clone' ))
+            ? $item->clone
+            : $item;
+    } keys %$self };
+    my $new = bless( $data, $class );
+    $_->parent( $new )   for @{ $new->_workflows || [] };
+    $_->workflow( $new ) for @{ $new->_testsets  || [] };
+    return $new;
 }
 
 1;

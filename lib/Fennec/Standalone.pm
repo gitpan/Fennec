@@ -1,6 +1,6 @@
 package Fennec::Standalone;
 BEGIN {
-  $Fennec::Standalone::VERSION = '0.026';
+  $Fennec::Standalone::VERSION = '0.027';
 }
 use strict;
 use warnings;

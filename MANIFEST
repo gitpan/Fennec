@@ -42,7 +42,7 @@ lib/Fennec/Output/Note.pm
 lib/Fennec/Output/Result.pm
 lib/Fennec/Parser.pm
 lib/Fennec/Runner.pm
-lib/Fennec/Runner/Proto.pm
+lib/Fennec/Runner/Config.pm
 lib/Fennec/Standalone.pm
 lib/Fennec/TestFile.pm
 lib/Fennec/TestFile/Meta.pm
@@ -64,6 +64,7 @@ lib/Test/Suite.pm
 script/fennec_init
 script/fennec_prove
 script/fennec_run.pl
+script/fennec_scaffold
 script/fennec_scaffold.pl
 share/vim/functions.vim
 share/vim/vimrc

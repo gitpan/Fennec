@@ -1,6 +1,6 @@
 package Fennec::Workflow::Spec;
 BEGIN {
-  $Fennec::Workflow::Spec::VERSION = '0.026';
+  $Fennec::Workflow::Spec::VERSION = '0.027';
 }
 use strict;
 use warnings;

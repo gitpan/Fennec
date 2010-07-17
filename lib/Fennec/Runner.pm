@@ -1,6 +1,6 @@
 package Fennec::Runner;
 BEGIN {
-  $Fennec::Runner::VERSION = '0.026';
+  $Fennec::Runner::VERSION = '0.027';
 }
 use strict;
 use warnings;
@@ -14,35 +14,117 @@ use Carp;
 use Fennec::Util::Alias qw/
     Fennec::Output::Diag
     Fennec::Output::Result
-    Fennec::Runner::Proto
 /;
 
 use Digest::MD5 qw/md5_hex/;
 use List::Util  qw/shuffle/;
 use Time::HiRes qw/time/;
+use base 'Exporter';
 
-Accessors qw/
-    files parallel_files parallel_tests threader ignore random pid parent_pid
-    collector search default_asserts default_workflows _benchmark_time seed
-    _started _finished finish_hooks bail_out root_workflow_class
-/;
+# Configuration items moved to require at bottom.
 
+Accessors qw/ _benchmark_time _finished _started bail_out finish_hooks seed /;
+
+our @EXPORT_OK = qw/add_config add_test_hook/;
 our $SINGLETON;
+our %CONFIG_OPTIONS;
+our @TEST_HOOKS;
 
 sub alias { $SINGLETON }
+sub config_options { \%CONFIG_OPTIONS }
+sub singleton { $SINGLETON }
+
+sub add_test_hook {
+    push @TEST_HOOKS => @_;
+}
+
+sub add_config {
+    my ( $name, @args ) = @_;
+
+    croak "Runner already defines $name"
+        if __PACKAGE__->can( $name );
+
+    my %options;
+    if ( @args ) {
+        %options = @args > 1
+            ? @args
+            : ( default => @args );
+    }
+
+    $options{ env_override } = uc("FENNEC_$name")
+        unless defined $options{ env_override }
+            && $options{ env_override } ne '1';
+
+    $options{ depends } = { map { $_ => 1 } @{ $options{ depends }} }
+        if $options{ depends };
+
+    $options{ name } = $name;
+
+    no strict 'refs';
+    Accessors $name;
+    $CONFIG_OPTIONS{ $name } = \%options;
+}
 
 sub init {
     my $class = shift;
+    my %in = @_;
     croak( 'Fennec::Runner has already been initialized' )
         if $SINGLETON;
-
     my $seed = $ENV{ FENNEC_SEED } || (( unpack "%L*", md5_hex( time * $$ )) ^ $$ );
     srand( $seed );
+    my $data = { seed => $seed };
 
-    $SINGLETON = Proto->new( @_, seed => $seed )
-                      ->rebless($class);
+    for my $option ( values %CONFIG_OPTIONS ) {
+        $class->_process_option( $option, \%in, $data, {} );
+    }
 
+    $SINGLETON = bless( $data, $class );
     return $SINGLETON;
+}
+
+# XXX TODO: Clean this up
+sub _process_option {
+    my $class = shift;
+    my ( $option, $in, $data, $state ) = @_;
+    my $name = $option->{ name };
+    $state->{ $name } ||= 0;
+    return if $state->{ $name } == 2;
+
+    croak join( "\n",
+        "Circular Dependencies detected:",
+        map { $state->{ $_ } == 1 ? $_ : () } keys %$state
+    ) if $state->{ $name } == 1;
+
+    $state->{ $name } = 1;
+    $class->_process_option(
+        $CONFIG_OPTIONS{ $_ },
+        $in,
+        $data,
+        $state
+    ) for keys %{ $option->{ depends } || {} };
+    $state->{ $name } = 2;
+
+    my $value;
+    $value = $ENV{ $option->{ env_override }}
+        if $option->{ env_override };
+    $value ||= $in->{ $name };
+
+    if ( $option->{ default } && !defined $value ) {
+        my $default = $option->{ default };
+        my $ref = ref( $default ) || 'NONE';
+        $value = $ref eq 'CODE'
+            ? $option->{ default }->( $data )
+            : $default;
+    }
+
+    croak "Option $name is required"
+        if $option->{ required }
+        && !defined $value;
+
+    $value = $option->{ modify }->( $value, $data )
+        if $option->{ modify };
+
+    $data->{ $name } = $value;
 }
 
 sub run_tests {
@@ -66,11 +148,11 @@ sub _test_thread {
     my ( $file ) = @_;
 
     try {
-        $self->process_workflow(
-            $self->_init_workflow(
-                $self->_init_file( $file )
-            )
-        );
+        my $test_class = $self->_init_file( $file );
+        my $root_workflow = $self->_init_workflow( $test_class );
+        my $test = $root_workflow->testfile();
+        $_->( $self, $test ) for @TEST_HOOKS;
+        $self->process_workflow( $root_workflow );
     }
     catch {
         if ( $_ =~ m/SKIP:\s*(.*)/ ) {
@@ -100,10 +182,12 @@ sub _init_file {
     return $file->load;
 }
 
+# XXX Do not modify this without knowing that Fennec::Standalone uses it as
+# XXX well!!!
 sub _init_workflow {
     my $self = shift;
-    my ( $tclass ) = @_;
-    my $test = $tclass->fennec_new;
+    my ( $test_class ) = @_;
+    my $test = $test_class->fennec_new;
     $test->fennec_meta->root_workflow->parent( $test );
     return $test->fennec_meta->root_workflow;
 }
@@ -227,6 +311,9 @@ Did you forget to run done_testing() in a standalone test file?
 EOT
     }
 }
+
+# Load after class
+require Fennec::Runner::Config;
 
 1;
 

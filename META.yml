@@ -28,4 +28,4 @@ requires:
   Scalar::Util: 0
   Time::HiRes: 0
   Try::Tiny: 0
-version: 0.026
+version: 0.027

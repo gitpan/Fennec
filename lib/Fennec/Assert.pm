@@ -1,6 +1,6 @@
 package Fennec::Assert;
 BEGIN {
-  $Fennec::Assert::VERSION = '0.026';
+  $Fennec::Assert::VERSION = '0.027';
 }
 use strict;
 use warnings;
@@ -183,18 +183,14 @@ sub _wrap_with_proto {
     return eval "sub($proto) { \$sub->( \@_ )}"
         || die($@);
 }
+
 1;
 
 =head1 DESCRIPTION
 
 Fennec::Assert - Assertions (tester functions) for Fennec.
 
-=head1 SEE ALSO
-
-B<The synopsys and most of the other usage documentation has been moved, this
-doc has been reduced to API documentation.>
-
-L<Fennec::Manual::Assertions>
+=head1 EXPORTED FUNCTIONS
 
 =over 4
 
@@ -214,6 +210,10 @@ also have the ($$) prototype.
 
 =item tester( name => sub { ... })
 
+=item __PACKAGE__->tester( 'name' )
+
+=item __PACKAGE__->tester( name => sub { ... })
+
 In the first form you export a package sub as a tester by name. In the second
 form you create a new export with an anonymous sub. Note: Your function will be
 wrapped inside another function that provides extra information such as
@@ -226,6 +226,10 @@ also have the ($$) prototype.
 =item util( 'name' )
 
 =item util( name => sub { ... })
+
+=item __PACKAGE__->util( 'name' )
+
+=item __PACKAGE__->util( name => sub { ... })
 
 In the first form you export a package sub as a util by name. In the second
 form you create a new export with an anonymous sub. Note: Utility functions are

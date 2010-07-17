@@ -1,6 +1,6 @@
 package Test::Suite;
 BEGIN {
-  $Test::Suite::VERSION = '0.026';
+  $Test::Suite::VERSION = '0.027';
 }
 use strict;
 use warnings;

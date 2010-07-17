@@ -1,6 +1,6 @@
 package Fennec::Assert::Core::Simple;
 BEGIN {
-  $Fennec::Assert::Core::Simple::VERSION = '0.026';
+  $Fennec::Assert::Core::Simple::VERSION = '0.027';
 }
 use strict;
 use warnings;
@@ -25,6 +25,16 @@ util TODO => sub(&;$) {
         diag( "Caught error in todo block\n  Error: $_\n  todo: $reason" );
     };
     Result->TODO( undef );
+};
+
+util SKIP => sub(&;$) {
+    my ( $code, $reason ) = @_;
+    $reason ||= "no reason given";
+    result(
+        pass => 1,
+        skip => $reason,
+        name => "Anonymous Skip block",
+    );
 };
 
 util diag => \&diag;

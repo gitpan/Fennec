@@ -1,6 +1,6 @@
 package Fennec::Assert::TBCore::Simple;
 BEGIN {
-  $Fennec::Assert::TBCore::Simple::VERSION = '0.026';
+  $Fennec::Assert::TBCore::Simple::VERSION = '0.027';
 }
 use strict;
 use warnings;

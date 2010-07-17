@@ -1,6 +1,6 @@
 package Fennec::Workflow::Methods;
 BEGIN {
-  $Fennec::Workflow::Methods::VERSION = '0.026';
+  $Fennec::Workflow::Methods::VERSION = '0.027';
 }
 use strict;
 use warnings;
@@ -38,6 +38,8 @@ sub testsets {
     unless( $self->subset ) {
         my $testfile = $self->testfile;
         my $tclass = blessed( $testfile );
+        confess( "$testfile is not a blessed Fennec::TestFile" )
+            unless $tclass;
 
         my @tests = Fennec::Util->package_sub_map( $tclass, qr/^test_/i );
         return unless @tests;

@@ -1,6 +1,6 @@
 package Fennec::Output::BailOut;
 BEGIN {
-  $Fennec::Output::BailOut::VERSION = '0.026';
+  $Fennec::Output::BailOut::VERSION = '0.027';
 }
 use strict;
 use warnings;

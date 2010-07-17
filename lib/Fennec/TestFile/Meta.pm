@@ -1,6 +1,6 @@
 package Fennec::TestFile::Meta;
 BEGIN {
-  $Fennec::TestFile::Meta::VERSION = '0.026';
+  $Fennec::TestFile::Meta::VERSION = '0.027';
 }
 use strict;
 use warnings;
@@ -17,7 +17,7 @@ use Scalar::Util qw/blessed/;
 
 our %MAP;
 
-Accessors qw/ root_workflow workflow_stack threader todo skip file sort /;
+Accessors qw/ root_workflow workflow_stack threader todo skip file sort stash /;
 
 sub set {
     my $class = shift;

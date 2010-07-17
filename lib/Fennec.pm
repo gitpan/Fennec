@@ -1,6 +1,6 @@
 package Fennec;
 BEGIN {
-  $Fennec::VERSION = '0.026';
+  $Fennec::VERSION = '0.027';
 }
 use strict;
 use warnings;
@@ -99,6 +99,7 @@ sub init_meta {
     my $self = shift;
 
     my $meta = Meta->new(
+        stash         => {},
         %{ $self->{ meta }},
         file          => $self->test_file,
         root_workflow => $self->root_workflow,
@@ -114,6 +115,8 @@ sub export_tools {
     *{ $self->test_class . '::done_testing' } = \&_done_testing;
     *{ $self->test_class . '::use_or_skip' } = \&_use_or_skip;
     *{ $self->test_class . '::require_or_skip' } = \&_require_or_skip;
+    *{ $self->test_class . '::M' } = \&_meta;
+    *{ $self->test_class . '::S' } = \&_stash;
     Interface->enhance( $self->test_class, $_, 'begin' ) for qw/use_or_skip require_or_skip/;
 }
 
@@ -161,6 +164,31 @@ sub _require_or_skip(*) {
     my $have = eval "require $package; 1";
     die "SKIP: $package is not installed\n" unless $have;
 };
+
+sub _meta { caller()->fennec_meta() }
+
+sub _stash {
+    my $class = caller();
+    my $meta = $class->fennec_meta();
+    my $stash = $meta->stash;
+
+    $stash ||= $meta->stash( {} );
+
+    if (@_ == 1) {
+        if ( my $ref = ref $_[0] ) {
+            croak(
+                "S() takes a hashref, a key name, or key value pairs.",
+                "S() does not take a $ref."
+            ) unless $ref eq 'HASH';
+            return $meta->stash( $_[0] )
+        }
+        return $stash->{ $_[0] };
+    }
+
+    %$stash = ( %$stash, @_ );
+
+    return wantarray ? %$stash : $stash;
+}
 
 1;
 

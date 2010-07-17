@@ -1,6 +1,6 @@
 package Fennec::TestFile;
 BEGIN {
-  $Fennec::TestFile::VERSION = '0.026';
+  $Fennec::TestFile::VERSION = '0.027';
 }
 use strict;
 use warnings;
@@ -22,6 +22,11 @@ sub fennec_new {
 sub fennec_meta {
     my $self = shift;
     Fennec::TestFile::Meta->get( $self );
+}
+
+sub stash {
+    my $self = shift;
+    $self->fennec_meta->stash( @_ );
 }
 
 1;
