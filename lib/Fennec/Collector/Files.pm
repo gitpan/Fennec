@@ -1,6 +1,6 @@
 package Fennec::Collector::Files;
 BEGIN {
-  $Fennec::Collector::Files::VERSION = '0.027';
+  $Fennec::Collector::Files::VERSION = '0.028';
 }
 use strict;
 use warnings;

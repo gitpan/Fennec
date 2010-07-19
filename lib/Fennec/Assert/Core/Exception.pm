@@ -1,6 +1,6 @@
 package Fennec::Assert::Core::Exception;
 BEGIN {
-  $Fennec::Assert::Core::Exception::VERSION = '0.027';
+  $Fennec::Assert::Core::Exception::VERSION = '0.028';
 }
 use strict;
 use warnings;

@@ -1,6 +1,6 @@
 package Fennec::Util::Alias;
 BEGIN {
-  $Fennec::Util::Alias::VERSION = '0.027';
+  $Fennec::Util::Alias::VERSION = '0.028';
 }
 use strict;
 use warnings;

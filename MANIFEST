@@ -106,7 +106,6 @@ t/Fennec/Output/Note.pm
 t/Fennec/Output/Result.pm
 t/Fennec/Parser.pm
 t/Fennec/Runner.pm
-t/Fennec/Runner/Proto.pm
 t/Fennec/Standalone.pm
 t/Fennec/TestFile.pm
 t/Fennec/TestFile/Meta.pm

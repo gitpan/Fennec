@@ -1,6 +1,6 @@
 package Fennec::Assert::Core::Simple;
 BEGIN {
-  $Fennec::Assert::Core::Simple::VERSION = '0.027';
+  $Fennec::Assert::Core::Simple::VERSION = '0.028';
 }
 use strict;
 use warnings;

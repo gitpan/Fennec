@@ -1,6 +1,6 @@
 package Fennec::Runner;
 BEGIN {
-  $Fennec::Runner::VERSION = '0.027';
+  $Fennec::Runner::VERSION = '0.028';
 }
 use strict;
 use warnings;
@@ -23,16 +23,21 @@ use base 'Exporter';
 
 # Configuration items moved to require at bottom.
 
-Accessors qw/ _benchmark_time _finished _started bail_out finish_hooks seed /;
+Accessors qw/ _benchmark_time _finished _started bail_out seed /;
 
-our @EXPORT_OK = qw/add_config add_test_hook/;
+our @EXPORT_OK = qw/add_config add_test_hook add_finish_hook /;
 our $SINGLETON;
 our %CONFIG_OPTIONS;
 our @TEST_HOOKS;
+our @FINISH_HOOKS;
 
 sub alias { $SINGLETON }
 sub config_options { \%CONFIG_OPTIONS }
 sub singleton { $SINGLETON }
+
+sub add_finish_hook {
+    push @FINISH_HOOKS => @_;
+}
 
 sub add_test_hook {
     push @TEST_HOOKS => @_;
@@ -249,15 +254,10 @@ sub _reap_callback {
 
 sub finish {
     my $self = shift;
-    $self->$_() for @{ $self->finish_hooks || []};
+    $self->$_() for @FINISH_HOOKS;
     $self->threader->finish;
     $self->collector->finish;
     $self->_finished(1);
-}
-
-sub add_finish_hook {
-    my $self = shift;
-    push @{ $self->{ finish_hooks }} => @_;
 }
 
 sub pid_changed {

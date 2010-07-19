@@ -1,6 +1,6 @@
 package Fennec::FileType::Module;
 BEGIN {
-  $Fennec::FileType::Module::VERSION = '0.027';
+  $Fennec::FileType::Module::VERSION = '0.028';
 }
 use strict;
 use warnings;
