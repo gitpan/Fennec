@@ -1,6 +1,6 @@
 package Fennec;
 BEGIN {
-  $Fennec::VERSION = '0.028';
+  $Fennec::VERSION = '0.029';
 }
 use strict;
 use warnings;
@@ -32,6 +32,7 @@ sub import {
     $fennec->export_tools;
     $fennec->export_workflows;
     $fennec->export_asserts;
+    $fennec->load_extra;
 
     1;
 }
@@ -130,6 +131,16 @@ sub export_asserts {
     my $self = shift;
     _export_package_to( load_package( $_, 'Fennec::Assert' ), $self->test_class )
         for @{ $self->asserts };
+}
+
+sub load_extra {
+    my $self = shift;
+    my $into = $self->test_class;
+    for my $set ( @{ Runner->load } ) {
+        my ( $package, @args ) = @$set;
+        eval "package $into; use $package \@args; 1"
+            || die( $@ );
+    }
 }
 
 sub _export_package_to {

@@ -1,6 +1,6 @@
 package Fennec::Runner::Config;
 BEGIN {
-  $Fennec::Runner::Config::VERSION = '0.028';
+  $Fennec::Runner::Config::VERSION = '0.029';
 }
 use strict;
 use warnings;
@@ -23,6 +23,7 @@ add_config parallel_files => 2;
 add_config parallel_tests => 2;
 add_config random         => 1;
 add_config ignore         => undef;
+add_config load           => sub {[]};
 
 add_config files => (
     env_override => 'FENNEC_FILE',

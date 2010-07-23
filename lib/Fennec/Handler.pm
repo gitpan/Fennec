@@ -1,6 +1,6 @@
 package Fennec::Handler;
 BEGIN {
-  $Fennec::Handler::VERSION = '0.028';
+  $Fennec::Handler::VERSION = '0.029';
 }
 use strict;
 use warnings;

@@ -17,7 +17,7 @@ my %module_build_args = (
     'Chad \'Exodist\' Granum <exodist7@gmail.com>'
   ],
   'dist_name' => 'Fennec',
-  'dist_version' => '0.028',
+  'dist_version' => '0.029',
   'license' => 'perl',
   'module_name' => 'Fennec',
   'recommends' => {},

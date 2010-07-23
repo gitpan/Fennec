@@ -1,6 +1,6 @@
 package Fennec::TestSet::SubSet;
 BEGIN {
-  $Fennec::TestSet::SubSet::VERSION = '0.028';
+  $Fennec::TestSet::SubSet::VERSION = '0.029';
 }
 use strict;
 use warnings;
