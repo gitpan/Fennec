@@ -1,13 +1,13 @@
 package Fennec::Standalone;
 BEGIN {
-  $Fennec::Standalone::VERSION = '0.029';
+  $Fennec::Standalone::VERSION = '0.030';
 }
 use strict;
 use warnings;
 require Fennec;
 use Fennec::Util::TBOverride;
 use Fennec::Runner qw/add_finish_hook/;
-use Fennec::Workflow;
+use Fennec::Workflow qw/:defaul !import/;
 use Fennec::Output::Result;
 
 sub import {

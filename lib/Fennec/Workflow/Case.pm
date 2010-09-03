@@ -1,6 +1,6 @@
 package Fennec::Workflow::Case;
 BEGIN {
-  $Fennec::Workflow::Case::VERSION = '0.029';
+  $Fennec::Workflow::Case::VERSION = '0.030';
 }
 use strict;
 use warnings;

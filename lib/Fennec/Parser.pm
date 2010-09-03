@@ -1,6 +1,6 @@
 package Fennec::Parser;
 BEGIN {
-  $Fennec::Parser::VERSION = '0.029';
+  $Fennec::Parser::VERSION = '0.030';
 }
 use strict;
 use warnings;

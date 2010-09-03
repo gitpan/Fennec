@@ -1,6 +1,6 @@
 package Fennec::Util::TBOverride;
 BEGIN {
-  $Fennec::Util::TBOverride::VERSION = '0.029';
+  $Fennec::Util::TBOverride::VERSION = '0.030';
 }
 use strict;
 use warnings;

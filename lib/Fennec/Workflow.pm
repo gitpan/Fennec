@@ -1,6 +1,6 @@
 package Fennec::Workflow;
 BEGIN {
-  $Fennec::Workflow::VERSION = '0.029';
+  $Fennec::Workflow::VERSION = '0.030';
 }
 use strict;
 use warnings;
@@ -58,14 +58,9 @@ export build_with => sub {
     });
 };
 
-sub import {
-    my $class = shift;
-    my $caller = caller;
-    my ( $imports, $specs ) = $class->_import_args( @_ );
-
+sub _import {
+    my ( $class, $caller, $specs ) = @_;
     return 1 unless( $specs->{subclass});
-
-    $class->export_to( $caller, $specs->{prefix} || undef, @$imports );
 
     no strict 'refs';
     push @{ $caller . '::ISA' } => $class

@@ -1,6 +1,6 @@
 package Fennec::Output::Result;
 BEGIN {
-  $Fennec::Output::Result::VERSION = '0.029';
+  $Fennec::Output::Result::VERSION = '0.030';
 }
 use strict;
 use warnings;
