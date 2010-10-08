@@ -17,7 +17,7 @@ my %module_build_args = (
     'Chad \'Exodist\' Granum <exodist7@gmail.com>'
   ],
   'dist_name' => 'Fennec',
-  'dist_version' => '0.030',
+  'dist_version' => '0.031',
   'license' => 'perl',
   'module_name' => 'Fennec',
   'recommends' => {},
@@ -29,7 +29,7 @@ my %module_build_args = (
     'Data::Dumper' => '0',
     'Devel::CallerStack' => '0',
     'Digest::MD5' => '0',
-    'Exporter::Declare' => '0.024',
+    'Exporter::Declare' => '0.101',
     'File::Temp' => '0',
     'List::MoreUtils' => '0',
     'List::Util' => '0',

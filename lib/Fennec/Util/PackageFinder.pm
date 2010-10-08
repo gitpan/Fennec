@@ -1,11 +1,11 @@
 package Fennec::Util::PackageFinder;
 BEGIN {
-  $Fennec::Util::PackageFinder::VERSION = '0.030';
+  $Fennec::Util::PackageFinder::VERSION = '0.031';
 }
 use strict;
 use warnings;
 
-use Exporter::Declare;
+use Fennec::Exporter::Declare;
 use Carp;
 
 export 'load_package';

@@ -1,6 +1,6 @@
 package Fennec::FileLoader;
 BEGIN {
-  $Fennec::FileLoader::VERSION = '0.030';
+  $Fennec::FileLoader::VERSION = '0.031';
 }
 use strict;
 use warnings;

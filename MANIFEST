@@ -25,6 +25,8 @@ lib/Fennec/Collector/Files.pm
 lib/Fennec/Collector/Interceptor.pm
 lib/Fennec/Config.pm
 lib/Fennec/Debug.pm
+lib/Fennec/Exporter/Declare.pm
+lib/Fennec/Exporter/Declare/Export.pm
 lib/Fennec/FileLoader.pm
 lib/Fennec/FileType.pm
 lib/Fennec/FileType/Module.pm

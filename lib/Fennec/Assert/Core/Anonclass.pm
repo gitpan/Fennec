@@ -1,6 +1,6 @@
 package Fennec::Assert::Core::Anonclass;
 BEGIN {
-  $Fennec::Assert::Core::Anonclass::VERSION = '0.030';
+  $Fennec::Assert::Core::Anonclass::VERSION = '0.031';
 }
 use strict;
 use warnings;

@@ -1,6 +1,6 @@
 package Fennec::TestSet;
 BEGIN {
-  $Fennec::TestSet::VERSION = '0.030';
+  $Fennec::TestSet::VERSION = '0.031';
 }
 use strict;
 use warnings;
@@ -9,7 +9,7 @@ use base 'Fennec::Base::Method';
 
 use Fennec::Parser;
 use Fennec::Util::Accessors;
-use Exporter::Declare;
+use Fennec::Exporter::Declare;
 use Try::Tiny;
 use Carp;
 use B;

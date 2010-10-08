@@ -1,6 +1,6 @@
 package Fennec::Assert::Interceptor;
 BEGIN {
-  $Fennec::Assert::Interceptor::VERSION = '0.030';
+  $Fennec::Assert::Interceptor::VERSION = '0.031';
 }
 use strict;
 use warnings;

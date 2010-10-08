@@ -1,6 +1,6 @@
 package Fennec::Workflow;
 BEGIN {
-  $Fennec::Workflow::VERSION = '0.030';
+  $Fennec::Workflow::VERSION = '0.031';
 }
 use strict;
 use warnings;
@@ -25,7 +25,7 @@ use Carp;
 use Time::HiRes       qw/time/;
 use Scalar::Util      qw/blessed/;
 use List::Util        qw/shuffle max min/;
-use Exporter::Declare qw/:extend/;
+use Fennec::Exporter::Declare qw/:extend/;
 
 Accessors qw/ parent _testsets _workflows built /;
 

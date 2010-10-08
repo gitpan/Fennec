@@ -1,12 +1,12 @@
 package Fennec::Parser;
 BEGIN {
-  $Fennec::Parser::VERSION = '0.030';
+  $Fennec::Parser::VERSION = '0.031';
 }
 use strict;
 use warnings;
 
 use Devel::Declare::Interface;
-use base 'Exporter::Declare::Export';
+use base 'Fennec::Exporter::Declare::Export';
 BEGIN { Devel::Declare::Interface::register_parser( 'fennec' )};
 
 our %NAMELESS;

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build: 0.3601
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.101831, CPAN::Meta::Converter version 2.101610'
+generated_by: 'Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.102400'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,7 +20,7 @@ requires:
   Data::Dumper: 0
   Devel::CallerStack: 0
   Digest::MD5: 0
-  Exporter::Declare: 0.024
+  Exporter::Declare: 0.101
   File::Temp: 0
   List::MoreUtils: 0
   List::Util: 0
@@ -28,4 +28,4 @@ requires:
   Scalar::Util: 0
   Time::HiRes: 0
   Try::Tiny: 0
-version: 0.030
+version: 0.031

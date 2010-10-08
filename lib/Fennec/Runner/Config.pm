@@ -1,6 +1,6 @@
 package Fennec::Runner::Config;
 BEGIN {
-  $Fennec::Runner::Config::VERSION = '0.030';
+  $Fennec::Runner::Config::VERSION = '0.031';
 }
 use strict;
 use warnings;
