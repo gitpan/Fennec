@@ -1,6 +1,6 @@
 package Fennec::Workflow::Methods;
 BEGIN {
-  $Fennec::Workflow::Methods::VERSION = '0.031';
+  $Fennec::Workflow::Methods::VERSION = '0.032';
 }
 use strict;
 use warnings;

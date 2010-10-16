@@ -19,6 +19,7 @@ requires:
   Cwd: 0
   Data::Dumper: 0
   Devel::CallerStack: 0
+  Devel::Declare::Parser: 0.017
   Digest::MD5: 0
   Exporter::Declare: 0.101
   File::Temp: 0
@@ -28,4 +29,4 @@ requires:
   Scalar::Util: 0
   Time::HiRes: 0
   Try::Tiny: 0
-version: 0.031
+version: 0.032

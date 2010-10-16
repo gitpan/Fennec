@@ -1,6 +1,6 @@
 package Fennec::Debug;
 BEGIN {
-  $Fennec::Debug::VERSION = '0.031';
+  $Fennec::Debug::VERSION = '0.032';
 }
 use strict;
 use warnings;

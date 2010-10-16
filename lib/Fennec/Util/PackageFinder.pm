@@ -1,6 +1,6 @@
 package Fennec::Util::PackageFinder;
 BEGIN {
-  $Fennec::Util::PackageFinder::VERSION = '0.031';
+  $Fennec::Util::PackageFinder::VERSION = '0.032';
 }
 use strict;
 use warnings;

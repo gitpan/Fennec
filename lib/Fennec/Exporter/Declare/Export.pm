@@ -1,6 +1,6 @@
 package Fennec::Exporter::Declare::Export;
 BEGIN {
-  $Fennec::Exporter::Declare::Export::VERSION = '0.031';
+  $Fennec::Exporter::Declare::Export::VERSION = '0.032';
 }
 use strict;
 use warnings;

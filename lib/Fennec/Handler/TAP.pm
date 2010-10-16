@@ -1,6 +1,6 @@
 package Fennec::Handler::TAP;
 BEGIN {
-  $Fennec::Handler::TAP::VERSION = '0.031';
+  $Fennec::Handler::TAP::VERSION = '0.032';
 }
 use strict;
 use warnings;
