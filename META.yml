@@ -13,7 +13,7 @@ name: Fennec
 provides:
   Fennec:
     file: lib/Fennec.pm
-    version: 1.000_1
+    version: 1.000_2
   Fennec::Listener:
     file: lib/Fennec/Listener.pm
   Fennec::Listener::TB:
@@ -51,4 +51,4 @@ requires:
   Test::Warn: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: 1.000_1
+version: 1.000_2
