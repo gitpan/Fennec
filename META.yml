@@ -1,32 +1,54 @@
 ---
-abstract: 'Workflow based testing framework for Perl.'
+abstract: 'A test helper providing RSPEC, Workflows, Parallelization, and Encapsulation.'
 author:
-  - "Chad 'Exodist' Granum <exodist7@gmail.com>"
-build_requires:
-  Module::Build: 0.3601
+  - 'Chad Granum <exodist7@gmail.com>'
 configure_requires:
-  Module::Build: 0.3601
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.102400'
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
 name: Fennec
+provides:
+  Fennec:
+    file: lib/Fennec.pm
+    version: 1.000_1
+  Fennec::Listener:
+    file: lib/Fennec/Listener.pm
+  Fennec::Listener::TB:
+    file: lib/Fennec/Listener/TB.pm
+  Fennec::Listener::TB2:
+    file: lib/Fennec/Listener/TB2.pm
+  Fennec::Listener::TB::Handle:
+    file: lib/Fennec/Listener/TB/Handle.pm
+  Fennec::Meta:
+    file: lib/Fennec/Meta.pm
+  Fennec::Runner:
+    file: lib/Fennec/Runner.pm
+  Fennec::Util:
+    file: lib/Fennec/Util.pm
+  Test::Workflow:
+    file: lib/Test/Workflow.pm
+  Test::Workflow::Block:
+    file: lib/Test/Workflow/Block.pm
+  Test::Workflow::Layer:
+    file: lib/Test/Workflow/Layer.pm
+  Test::Workflow::Meta:
+    file: lib/Test/Workflow/Meta.pm
+  Test::Workflow::Test:
+    file: lib/Test/Workflow/Test.pm
 requires:
-  Benchmark: 0
-  Carp::Always: 0
-  Cwd: 0
-  Data::Dumper: 0
-  Devel::CallerStack: 0
-  Devel::Declare::Parser: 0.017
-  Digest::MD5: 0
-  Exporter::Declare: 0.101
-  File::Temp: 0
-  List::MoreUtils: 0
+  Carp: 0
+  Exporter::Declare: 0
   List::Util: 0
-  Parallel::Runner: 0.008
+  Object::Quick: 0.012
+  Parallel::Runner: 0.010
   Scalar::Util: 0
-  Time::HiRes: 0
-  Try::Tiny: 0
-version: 0.032
+  TAP::Parser: 0
+  Test::Exception: 0.29
+  Test::Simple: 0.88
+  Test::Warn: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.000_1

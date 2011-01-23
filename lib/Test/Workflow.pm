@@ -1,0 +1,413 @@
+package Test::Workflow;
+use strict;
+use warnings;
+
+use Exporter::Declare;
+use Test::Workflow::Meta;
+use Test::Workflow::Test;
+use Test::Workflow::Layer;
+use List::Util qw/shuffle/;
+use Carp qw/croak/;
+
+our @CARP_NOT = qw/ Test::Workflow Test::Workflow::Test /;
+
+default_exports qw/
+    tests       run_tests
+    describe    it
+    cases       case
+    before_each after_each around_each
+    before_all  after_all  around_all
+    with_tests
+    test_sort
+/;
+
+gen_default_export TEST_WORKFLOW => sub {
+    my ( $class, $importer ) = @_;
+    my $meta = Test::Workflow::Meta->new($importer);
+    return sub { $meta };
+};
+
+{ no warnings 'once'; @DB::CARP_NOT = qw/ DB Test::Workflow /}
+sub _get_layer {
+    package DB;
+    use Carp qw/croak/;
+    use Scalar::Util qw/blessed/;
+
+    my ($sub, $caller) = @_;
+
+    my @parent = caller(2);
+    my @pargs = @DB::args;
+    my $layer = $pargs[-1];
+
+    if ( blessed($layer) && blessed($layer)->isa( 'Test::Workflow::Layer' )) {
+        croak "Layer has already been finalized!"
+            if $layer->finalized;
+        return $layer;
+    }
+
+    my $meta = $caller->[0]->TEST_WORKFLOW;
+    croak "$sub() can only be used within a describe or case block, or at the package level. (Could not find layer, did you modify \@_?)"
+        if $meta->build_complete;
+
+    return $meta->root_layer;
+}
+
+sub with_tests  { my @caller = caller; _get_layer( 'with_tests', \@caller )->merge_in( \@caller, @_ )}
+
+sub tests { my @caller = caller; _get_layer( 'tests', \@caller )->add_test( \@caller, shift( @_ ), verbose => 1, @_ )}
+sub it    { my @caller = caller; _get_layer( 'it',    \@caller )->add_test( \@caller, shift( @_ ), verbose => 1, @_ )}
+sub case  { my @caller = caller; _get_layer( 'case',  \@caller )->add_case( \@caller, @_ )}
+
+sub describe { my @caller = caller; _get_layer( 'describe', \@caller )->add_child( \@caller, @_ )}
+sub cases    { my @caller = caller; _get_layer( 'cases',    \@caller )->add_child( \@caller, @_ )}
+
+sub before_each { my @caller = caller; _get_layer( 'before_each', \@caller )->add_before_each( \@caller, @_ )}
+sub before_all  { my @caller = caller; _get_layer( 'before_all',  \@caller )->add_before_all(  \@caller, @_ )}
+sub after_each  { my @caller = caller; _get_layer( 'after_each',  \@caller )->add_after_each(  \@caller, @_ )}
+sub after_all   { my @caller = caller; _get_layer( 'after_all',   \@caller )->add_after_all(   \@caller, @_ )}
+sub around_each { my @caller = caller; _get_layer( 'around_each', \@caller )->add_around_each( \@caller, @_ )}
+sub around_all  { my @caller = caller; _get_layer( 'around_all',  \@caller )->add_around_all(  \@caller, @_ )}
+
+sub test_sort { caller->TEST_WORKFLOW->test_sort( @_ )}
+
+sub run_tests {
+    my ( $instance ) = @_;
+    unless ( $instance ) {
+        my $caller = caller;
+        $instance = $caller->new() if $caller->can( 'new' );
+        $instance ||= bless({}, $caller);
+    }
+    my $layer = $instance->TEST_WORKFLOW->root_layer;
+    $instance->TEST_WORKFLOW->build_complete(1);
+    my @tests = get_tests( $instance, $layer, 'PACKAGE LEVEL', [], [], [] );
+    my $sort = $instance->TEST_WORKFLOW->test_sort || 'rand';
+    @tests = order_tests( $sort, @tests );
+    $_->run( $instance ) for @tests;
+}
+
+sub order_tests {
+    my ( $sort, @tests ) = @_;
+
+    return if $sort =~ /^ord/;
+
+    if ( "$sort" =~ /^sort/ ) {
+        return sort { $a->name cmp $b->name } @tests;
+    }
+    elsif ( "$sort" =~ /^rand/ ) {
+        return shuffle @tests;
+    }
+    elsif( ref $sort eq 'CODE' ) {
+        return $sort->( @tests );
+    }
+
+    croak "'$sort' is not a recognized option to test_sort";
+}
+
+sub get_tests {
+    my ( $instance, $layer, $name, $before_each, $after_each, $around_each ) = @_;
+    # get before_each and after_each
+    push    @$before_each => @{ $layer->before_each };
+    push    @$around_each => @{ $layer->around_each };
+    unshift @$after_each  => @{ $layer->after_each  };
+
+    my @tests = @{ $layer->test };
+
+    if ( my $specific = $ENV{FENNEC_TEST}) {
+        @tests = grep {
+            my $out = 0;
+            if ( $specific =~ m/^\d+$/ ) {
+                $out = 1 if $_->start_line <= $specific && $_->end_line >= $specific;
+            }
+            else {
+                $out = 1 if $_->name eq $specific;
+            }
+            $out;
+        } @tests;
+    }
+
+    my @cases = @{ $layer->case };
+    if ( @cases ) {
+        @tests = map {
+            my $test = $_;
+            map { Test::Workflow::Test->new(
+                setup => [ $_    ],
+                tests => [ $test->clone_with(
+                    name => "'" . $_->name . "' x '" . $test->name . "'"
+                )],
+            )} @cases
+        } @tests;
+    }
+
+    @tests = map { Test::Workflow::Test->new(
+        setup      => [ @$before_each ],
+        tests      => [ $_            ],
+        teardown   => [ @$after_each  ],
+        around     => [ @$around_each ],
+        block_name => $name,
+    )} @tests;
+
+    push @tests => map {
+        my $layer = Test::Workflow::Layer->new;
+        $_->run( $instance, $layer );
+        warn "No tests in block '" . $_->name . "' approx lines " . $_->start_line . "->" . $_->end_line . "\n"
+            unless @{ $layer->test };
+        get_tests( $instance, $layer, $_->name, [@$before_each], [@$after_each], [@$around_each] );
+    } @{ $layer->child };
+
+    my @before_all = @{ $layer->before_all };
+    my @after_all  = @{ $layer->after_all  };
+    my @around_all = @{ $layer->around_all };
+    return Test::Workflow::Test->new(
+        setup      => [ @before_all ],
+        tests      => [ @tests      ],
+        teardown   => [ @after_all  ],
+        around     => [ @around_all ],
+        block_name => $name,
+    ) if @before_all || @after_all || @around_all;
+
+    return @tests;
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+Test::Workflow - Provide test grouping, reusability, and structuring such as
+RSPEC and cases.
+
+=head1 DESCRIPTION
+
+Test::Workflow provides tools for grouping and structuring tests. There is also
+a facility to write re-usable tests. Test::Workflow test files define classes.
+Tests within the files are defined as a type of method.
+
+Test::Workflow provides an RSPEC implementation. This implementation includes
+C<describe> blocks, C<it> blocks, as well as C<before_each>, C<before_all>,
+C<after_each>, C<after_all>. There are even two new types: C<around_each> and
+C<around_all>.
+
+Test::Workflow provides a cases workflow. This workflow allows you to create
+multiple cases, and multiple tests. Each test will be run under each case. This
+allows you to write a test that should pass under multiple conditions, then
+write a case that builds that specific condition.
+
+Test::Workflow provides a way to 'inherit' tests. You can write classes that
+use Test::Workflow, and define test groups, but not run them. These classes can
+then be imported into as many test classes as you want. This is achieved with
+the C<with_tests> function.
+
+Test::Workflow gives you control over the order in which test groups will be
+run. You can use the predefined 'random', 'ordered', or 'sort' settings. You
+may also provide your own ordering function. This is achieved using the
+C<test_sort> function.
+
+=head1 SYNOPSIS
+
+    package MyTest;
+    use strict;
+    use warnings;
+
+    use Test::More;
+    use Test::Workflow;
+
+    with_tests qw/ Test::TemplateA Test::TemplateB /;
+    test_sort 'rand';
+
+    # Tests can be at the package level
+    use_ok( 'MyClass' );
+
+    tests loner => sub {
+        my $self = shift;
+        ok( 1, "1 is the loneliest number... " );
+    };
+
+    tests not_ready => (
+        todo => "Feature not implemented",
+        code => sub { ... },
+    );
+
+    tests very_not_ready => (
+        skip => "These tests will die if run"
+        code => sub { ... },
+    );
+
+    run_tests();
+    done_testing();
+
+=head2 RSPEC WORKFLOW
+
+Here setup/teardown methods are declared in the order in which they are run,
+but they can really be declared anywhere within the describe block and the
+behavior will be identical.
+
+    describe example => sub {
+        my $self = shift;
+        my $number = 0;
+        my $letter = 'A';
+
+        before_all setup => sub { $number = 1 };
+
+        before_each letter_up => sub { $letter++ };
+
+        # it() is an alias for tests()
+        it check => sub {
+            my $self = shift;
+            is( $letter, 'B', "Letter was incremented" );
+            is( $number, 2,   "number was incremented" );
+        };
+
+        after_each reset => sub { $number = 1 };
+
+        after_all teardown => sub {
+            is( $number, 1, "number is back to 1" );
+        };
+
+        describe nested => sub {
+            # This nested describe block will inherit before_each and
+            # after_each from the parent block.
+            ...
+        };
+
+        describe maybe_later => (
+            todo => "We might get to this",
+            code => { ... },
+        );
+    };
+
+    describe addon => sub {
+        my $self = shift;
+
+        around_each localize_env => sub {
+            my $self = shift;
+            my ( $inner ) = @_;
+
+            local %ENV = ( %ENV, foo => 'bar' );
+
+            $inner->();
+        };
+
+        tests foo => sub {
+            is( $ENV{foo}, 'bar', "in the localized environment" );
+        };
+    };
+
+=head2 CASE WORKFLOW
+
+Cases are used when you have a test that you wish to run under several tests
+conditions. The following is a trivial example. Each test will be run once
+under each case. B<Beware!> this will run (cases x tests), with many tests and
+cases this can be a huge set of actual tests. In this example 8 in total will
+be run.
+
+B<Note:> The 'cases' keyword is an alias to describe. case blocks can go into
+any workflow and will work as expected.
+
+    cases check_several_numbers => sub {
+        my $number;
+        case one => sub { $number = 2 };
+        case one => sub { $number = 4 };
+        case one => sub { $number = 6 };
+        case one => sub { $number = 8 };
+
+        tests is_even => sub {
+            ok( !$number % 2, "number is even" );
+        };
+
+        tests only_digits => sub {
+            like( $number, qr/^\d+$/i, "number is all digits" );
+        };
+    };
+
+=head1 EXPORTS
+
+=over 4
+
+=item with_tests( @CLASSES )
+
+Use tests defined in the specified classes.
+
+=item test_sort( sub { my @tests = @_; ...; return @tests })
+
+=item test_sort( 'sort' )
+
+=item test_sort( 'random' )
+
+=item test_sort( 'ordered' )
+
+Declare how tests should be sorted.
+
+=item cases( name => sub { ... })
+
+=item cases( 'name', %params, code => sub { ... })
+
+=item describe( name => sub { ... })
+
+=item describe( 'name', %params, code => sub { ... })
+
+Define a block that encapsulates workflow elements.
+
+=item tests( name => sub { ... })
+
+=item tests( 'name', %params, code => sub { ... })
+
+=item it( name => sub { ... })
+
+=item it( 'name', %params, code => sub { ... })
+
+Define a test block.
+
+=item case( name => sub { ... })
+
+=item case( 'name', %params, code => sub { ... })
+
+Define a case, each test will be run once per case that is defined at the same
+level (within the same describe or cases block).
+
+=item before_each( name => sub { ... })
+
+=item after_each( name => sub { ... })
+
+=item before_all( name => sub { ... })
+
+=item after_all( name => sub { ... })
+
+These define setup and teardown functions that will be run around tests.
+
+=item around_each( name => sub { ... })
+
+=item around_all( name => sub { ... })
+
+These are special additions to the setup and teardown methods. They are used
+like so:
+
+    around_each localize_env => sub {
+        my $self = shift;
+        my ( $inner ) = @_;
+
+        local %ENV = ( %ENV, foo => 'bar' );
+
+        $inner->();
+    };
+
+=item run_tests()
+
+This will finalize the meta-data (forbid addition of new tests) and run the
+tests.
+
+=back
+
+=head1 AUTHORS
+
+Chad Granum L<exodist7@gmail.com>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2011 Chad Granum
+
+Test-Workflow is free software; Standard perl licence.
+
+Test-Workflow is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the license for more details.

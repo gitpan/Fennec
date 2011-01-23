@@ -1,51 +1,27 @@
-
+#!/usr/bin/perl
 use strict;
 use warnings;
+use Module::Build;
 
-use Module::Build 0.3601;
-
-
-my %module_build_args = (
-  'build_requires' => {
-    'Module::Build' => '0.3601'
-  },
-  'configure_requires' => {
-    'Module::Build' => '0.3601'
-  },
-  'dist_abstract' => 'Workflow based testing framework for Perl.',
-  'dist_author' => [
-    'Chad \'Exodist\' Granum <exodist7@gmail.com>'
-  ],
-  'dist_name' => 'Fennec',
-  'dist_version' => '0.032',
-  'license' => 'perl',
-  'module_name' => 'Fennec',
-  'recommends' => {},
-  'recursive_test_files' => 1,
-  'requires' => {
-    'Benchmark' => '0',
-    'Carp::Always' => '0',
-    'Cwd' => '0',
-    'Data::Dumper' => '0',
-    'Devel::CallerStack' => '0',
-    'Devel::Declare::Parser' => '0.017',
-    'Digest::MD5' => '0',
-    'Exporter::Declare' => '0.101',
-    'File::Temp' => '0',
-    'List::MoreUtils' => '0',
-    'List::Util' => '0',
-    'Parallel::Runner' => '0.008',
-    'Scalar::Util' => '0',
-    'Time::HiRes' => '0',
-    'Try::Tiny' => '0'
-  },
-  'script_files' => [],
-  'share_dir' => {
-    'dist' => 'share'
-  }
+my $build = Module::Build->new(
+    module_name => 'Fennec',
+    license     => 'perl',
+    dist_author => 'Chad Granum <exodist7@gmail.com>',
+    create_readme => 1,
+    requires => {
+        'Carp'              => 0,
+        'Exporter::Declare' => 0,
+        'Object::Quick'     => '0.012',
+        'Parallel::Runner'  => '0.010',
+        'Scalar::Util'      => 0,
+        'List::Util'        => 0,
+        'TAP::Parser'       => 0,
+        'Test::Exception'   => '0.29',
+        'Test::Simple'      => '0.88',
+        'Test::Warn'        => 0,
+    },
+    build_requires => {
+    },
 );
-
-
-my $build = Module::Build->new(%module_build_args);
 
 $build->create_build_script;
