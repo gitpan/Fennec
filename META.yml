@@ -13,7 +13,7 @@ name: Fennec
 provides:
   Fennec:
     file: lib/Fennec.pm
-    version: 1.000_2
+    version: 1.000_3
   Fennec::Listener:
     file: lib/Fennec/Listener.pm
   Fennec::Listener::TB:
@@ -42,7 +42,7 @@ requires:
   Carp: 0
   Exporter::Declare: 0
   List::Util: 0
-  Object::Quick: 0.012
+  Mock::Quick: 1.000_1
   Parallel::Runner: 0.010
   Scalar::Util: 0
   TAP::Parser: 0
@@ -50,5 +50,8 @@ requires:
   Test::Simple: 0.88
   Test::Warn: 0
 resources:
+  bugtracker: http://github.com/exodist/Fennec/issues
+  homepage: http://open-exodus.net/projects/Fennec
   license: http://dev.perl.org/licenses/
-version: 1.000_2
+  repository: http://github.com/exodist/Fennec
+version: 1.000_3

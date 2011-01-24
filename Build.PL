@@ -11,7 +11,7 @@ my $build = Module::Build->new(
     requires => {
         'Carp'              => 0,
         'Exporter::Declare' => 0,
-        'Object::Quick'     => '0.012',
+        'Mock::Quick'     => '1.000_1',
         'Parallel::Runner'  => '0.010',
         'Scalar::Util'      => 0,
         'List::Util'        => 0,
@@ -22,6 +22,13 @@ my $build = Module::Build->new(
     },
     build_requires => {
     },
+    meta_merge => {
+        resources => {
+            repository  => 'http://github.com/exodist/Fennec',
+            bugtracker  => 'http://github.com/exodist/Fennec/issues',
+            homepage    => 'http://open-exodus.net/projects/Fennec'
+        },
+    }
 );
 
 $build->create_build_script;

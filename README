@@ -28,7 +28,7 @@ FEATURES
 
     Test reordering
         Tests groups can be sorted, randomized, or sorted via a custom
-        method. (This comes see Test::Workflow)
+        method. (see Test::Workflow)
 
     Test::Builder and Test::Builder2 compatibility
         Fennec is compatible with Test::Builder based tools. Test::Builder2
@@ -46,7 +46,7 @@ FEATURES
         You do not need to worry about test counts.
 
     Diagnostic messages are grouped with the failed test
-        Annoyed when your test failue and the diagnostics messages about
+        Annoyed when your test failure and the diagnostics messages about
         that test are decoupled?
 
             ok 1 - foo
@@ -96,7 +96,7 @@ SYNOPSIS
 
     By default these test groups will be run in parallel. They will also be
     run in random order by default. See the "CONFIGURATION" for more details
-    on controling behavior. Also see Test::Workflow for more useful and
+    on controlling behavior. Also see Test::Workflow for more useful and
     poweful test groups and structures.
 
   FRIENDLIER INTERFACE
@@ -160,26 +160,27 @@ EDITOR INTEGRATION
         endfunction
 
         " Go to command mode, save the file, run the current test
+        :map <F8> <ESC>:w<cr>:call RunFennecLine()<cr>
         :imap <F8> <ESC>:w<cr>:call RunFennecLine()<cr>
 
 MODULES LOADED AUTOMATICALLY WITH FENNEC
     Test::More
-        The standard perl test library. Test::More
+        The standard perl test library.
 
     Test::Exception
         One of the more useful test libraries, used to test code that throws
-        exceptions (dies). Test::Exception
+        exceptions (dies).
 
     Test::Warn
-        Test code that issues warnings. Test::Warn
+        Test code that issues warnings.
 
     Test::Workflow
         Provides RSPEC, and several other workflow related helpers. Also
-        provides the test group encapsulation. Test::Workflow
+        provides the test group encapsulation.
 
     Mock::Quick
         Quick and effective mocking with no action at a distance side
-        effects. Mock::Quick
+        effects.
 
 MODULES FENNEC MAKES AN EFFORT TO SUPPORT
     Test::Class
@@ -408,8 +409,113 @@ MORE COMPLETE EXAMPLE
 
         1;
 
+MOCKING FROM MOCK::QUICK
+    Mock::Quick is imported by default. Mock::Quick is a powerful mocking
+    library with a very friendly syntax.
+
+  MOCKING OBJECTS
+        use Mock::Quick;
+
+        my $obj = obj(
+            foo => 'bar',            # define attribute
+            do_it => qmeth { ... },  # define method
+            ...
+        );
+
+        is( $obj->foo, 'bar' );
+        $obj->foo( 'baz' );
+        is( $obj->foo, 'baz' );
+
+        $obj->do_it();
+
+        # define the new attribute automatically
+        $obj->bar( 'xxx' );
+
+        # define a new method on the fly
+        $obj->baz( qmeth { ... });
+
+        # remove an attribute or method
+        $obj->baz( qclear() );
+
+  MOCKING CLASSES
+        use Mock::Quick;
+
+        my $control = qclass(
+            # Insert a generic new() method (blessed hash)
+            -with_new => 1,
+
+            # Inheritance
+            -subclass => 'Some::Class',
+            # Can also do
+            -subclass => [ 'Class::A', 'Class::B' ],
+
+            # generic get/set attribute methods.
+            -attributes => [ qw/a b c d/ ],
+
+            # Method that simply returns a value.
+            simple => 'value',
+
+            # Custom method.
+            method => sub { ... },
+        );
+
+        my $obj = $control->packahe->new;
+
+        # Override a method
+        $control->override( foo => sub { ... });
+
+        # Restore it to the original
+        $control->restore( 'foo' );
+
+        # Remove the anonymous namespace we created.
+        $control->undefine();
+
+  TAKING OVER EXISTING CLASSES
+        use Mock::Quick;
+
+        my $control = qtakeover( 'Some::Package' );
+
+        # Override a method
+        $control->override( foo => sub { ... });
+
+        # Restore it to the original
+        $control->restore( 'foo' );
+
+        # Destroy the control object and completely restore the original class Some::Package.
+        $control = undef;
+
+  MOCKING EXPORTS
+    Mock-Quick uses Exporter::Declare. This allows for exports to be
+    prefixed or renamed. See "RENAMING IMPORTED ITEMS" in Exporter::Declare
+    for more information.
+
+    $obj = qobj( attribute => value, ... )
+        Create an object. Every possible attribute works fine as a get/set
+        accessor. You can define other methods using qmeth {...} and
+        assigning that to an attribute. You can clear a method using
+        qclear() as an argument.
+
+        See Mock::Quick::Object for more.
+
+    $control = qclass( -config => ..., name => $value || sub { ... }, ... )
+        Define an anonymous package with the desired methods and
+        specifications.
+
+        See Mock::Quick::Class for more.
+
+    $control = qtakeover( $package )
+        Take control over an existing class.
+
+        See Mock::Quick::Class for more.
+
+    qclear()
+        Returns a special reference that when used as an argument, will
+        cause Mock::Quick::Object methods to be cleared.
+
+    qmeth { my $self = shift; ... }
+        Define a method for an Mock::Quick::Object instance.
+
 ADDITIONAL USER DOCUMENTATION
-    Fennec::Recipe::SingleRunner
     Fennec::Recipe::CustomFennec
     Fennec::Recipe::CustomRunner
 

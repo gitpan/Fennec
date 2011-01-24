@@ -4,11 +4,11 @@ use warnings;
 
 use Fennec::Util qw/inject_sub/;
 
-our $VERSION = '1.000_2';
+our $VERSION = '1.000_3';
 
 sub defaults {(
     utils => [qw/
-        Test::More Test::Warn Test::Exception Test::Workflow
+        Test::More Test::Warn Test::Exception Test::Workflow Mock::Quick
     /],
     parallel => 3,
     runner_class => 'Fennec::Runner',
@@ -144,8 +144,8 @@ up to 3 processes)
 
 =item Test reordering
 
-Tests groups can be sorted, randomized, or sorted via a custom method. (This
-comes see L<Test::Workflow>)
+Tests groups can be sorted, randomized, or sorted via a custom method. (see
+L<Test::Workflow>)
 
 =item Test::Builder and Test::Builder2 compatibility
 
@@ -166,7 +166,7 @@ You do not need to worry about test counts.
 
 =item Diagnostic messages are grouped with the failed test
 
-Annoyed when your test failue and the diagnostics messages about that test are
+Annoyed when your test failure and the diagnostics messages about that test are
 decoupled?
 
     ok 1 - foo
@@ -218,7 +218,7 @@ errors will still go to STDERR.
 
 By default these test groups will be run in parallel. They will also be run in
 random order by default. See the L</CONFIGURATION> for more details on
-controling behavior. Also see L<Test::Workflow> for more useful and poweful
+controlling behavior. Also see L<Test::Workflow> for more useful and poweful
 test groups and structures.
 
 =head2 FRIENDLIER INTERFACE
@@ -286,34 +286,34 @@ test in the current file:
     endfunction
 
     " Go to command mode, save the file, run the current test
+    :map <F8> <ESC>:w<cr>:call RunFennecLine()<cr>
     :imap <F8> <ESC>:w<cr>:call RunFennecLine()<cr>
 
 =head1 MODULES LOADED AUTOMATICALLY WITH FENNEC
 
 =over 4
 
-=item Test::More
+=item L<Test::More>
 
-The standard perl test library. L<Test::More>
+The standard perl test library.
 
-=item Test::Exception
+=item L<Test::Exception>
 
 One of the more useful test libraries, used to test code that throws exceptions
-(dies). L<Test::Exception>
+(dies).
 
-=item Test::Warn
+=item L<Test::Warn>
 
-Test code that issues warnings. L<Test::Warn>
+Test code that issues warnings.
 
-=item Test::Workflow
+=item L<Test::Workflow>
 
 Provides RSPEC, and several other workflow related helpers. Also provides the
-test group encapsulation. L<Test::Workflow>
+test group encapsulation.
 
-=item Mock::Quick
+=item L<Mock::Quick>
 
 Quick and effective mocking with no action at a distance side effects.
-L<Mock::Quick>
 
 =back
 
@@ -321,15 +321,15 @@ L<Mock::Quick>
 
 =over 4
 
-=item Test::Class
+=item L<Test::Class>
 
 A Fennec class can also be a Test::Class class.
 
-=item Test::Builder
+=item L<Test::Builder>
 
 If Fennec did not support this who would use it?
 
-=item Test::Builder2
+=item L<Test::Builder2>
 
 There is currently experimental support for Test::Builder2. Once Test::Builder2
 is officially released, support will be finalized.
@@ -571,11 +571,126 @@ any workflow and will work as expected.
 
     1;
 
-=head1 ADDITIONAL USER DOCUMENTATION
+=head1 MOCKING FROM MOCK::QUICK
+
+L<Mock::Quick> is imported by default. L<Mock::Quick> is a powerful mocking
+library with a very friendly syntax.
+
+=head2 MOCKING OBJECTS
+
+    use Mock::Quick;
+
+    my $obj = obj(
+        foo => 'bar',            # define attribute
+        do_it => qmeth { ... },  # define method
+        ...
+    );
+
+    is( $obj->foo, 'bar' );
+    $obj->foo( 'baz' );
+    is( $obj->foo, 'baz' );
+
+    $obj->do_it();
+
+    # define the new attribute automatically
+    $obj->bar( 'xxx' );
+
+    # define a new method on the fly
+    $obj->baz( qmeth { ... });
+
+    # remove an attribute or method
+    $obj->baz( qclear() );
+
+=head2 MOCKING CLASSES
+
+    use Mock::Quick;
+
+    my $control = qclass(
+        # Insert a generic new() method (blessed hash)
+        -with_new => 1,
+
+        # Inheritance
+        -subclass => 'Some::Class',
+        # Can also do
+        -subclass => [ 'Class::A', 'Class::B' ],
+
+        # generic get/set attribute methods.
+        -attributes => [ qw/a b c d/ ],
+
+        # Method that simply returns a value.
+        simple => 'value',
+
+        # Custom method.
+        method => sub { ... },
+    );
+
+    my $obj = $control->packahe->new;
+
+    # Override a method
+    $control->override( foo => sub { ... });
+
+    # Restore it to the original
+    $control->restore( 'foo' );
+
+    # Remove the anonymous namespace we created.
+    $control->undefine();
+
+=head2 TAKING OVER EXISTING CLASSES
+
+    use Mock::Quick;
+
+    my $control = qtakeover( 'Some::Package' );
+
+    # Override a method
+    $control->override( foo => sub { ... });
+
+    # Restore it to the original
+    $control->restore( 'foo' );
+
+    # Destroy the control object and completely restore the original class Some::Package.
+    $control = undef;
+
+=head2 MOCKING EXPORTS
+
+Mock-Quick uses L<Exporter::Declare>. This allows for exports to be prefixed or renamed.
+See L<Exporter::Declare/RENAMING IMPORTED ITEMS> for more information.
 
 =over 4
 
-=item L<Fennec::Recipe::SingleRunner>
+=item $obj = qobj( attribute => value, ... )
+
+Create an object. Every possible attribute works fine as a get/set accessor.
+You can define other methods using qmeth {...} and assigning that to an
+attribute. You can clear a method using qclear() as an argument.
+
+See L<Mock::Quick::Object> for more.
+
+=item $control = qclass( -config => ..., name => $value || sub { ... }, ... )
+
+Define an anonymous package with the desired methods and specifications.
+
+See L<Mock::Quick::Class> for more.
+
+=item $control = qtakeover( $package )
+
+Take control over an existing class.
+
+See L<Mock::Quick::Class> for more.
+
+=item qclear()
+
+Returns a special reference that when used as an argument, will cause
+Mock::Quick::Object methods to be cleared.
+
+=item qmeth { my $self = shift; ... }
+
+Define a method for an L<Mock::Quick::Object> instance.
+
+=back
+
+=head1 ADDITIONAL USER DOCUMENTATION
+
+=over 4
 
 =item L<Fennec::Recipe::CustomFennec>
 
