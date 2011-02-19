@@ -4,7 +4,7 @@ author:
   - 'Chad Granum <exodist7@gmail.com>'
 configure_requires:
   Module::Build: 0.36
-generated_by: 'Module::Build version 0.3607'
+generated_by: 'Module::Build version 0.3624'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -13,7 +13,7 @@ name: Fennec
 provides:
   Fennec:
     file: lib/Fennec.pm
-    version: 1.000
+    version: 1.001
   Fennec::Listener:
     file: lib/Fennec/Listener.pm
   Fennec::Listener::TB:
@@ -54,4 +54,4 @@ resources:
   homepage: http://open-exodus.net/projects/Fennec
   license: http://dev.perl.org/licenses/
   repository: http://github.com/exodist/Fennec
-version: 1.000
+version: 1.001

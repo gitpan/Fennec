@@ -1,4 +1,5 @@
 Build.PL
+CHANGES
 GOALS
 lib/Fennec.pm
 lib/Fennec/Listener.pm
@@ -16,7 +17,6 @@ lib/Test/Workflow/Layer.pm
 lib/Test/Workflow/Meta.pm
 lib/Test/Workflow/Test.pm
 MANIFEST			This list of files
-META.yml
 README
 t/CantFindLayer.t
 t/import_skip.t
@@ -27,3 +27,4 @@ t/Self-Running.t
 t/Test-Class.t
 t/Workflow.t
 t/Workflow_Fennec.t
+META.yml
