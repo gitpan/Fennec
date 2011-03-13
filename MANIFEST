@@ -6,6 +6,7 @@ lib/Fennec/Listener.pm
 lib/Fennec/Listener/TB.pm
 lib/Fennec/Listener/TB/Handle.pm
 lib/Fennec/Listener/TB2.pm
+lib/Fennec/Listener/TBWin32.pm
 lib/Fennec/Meta.pm
 lib/Fennec/Recipe/CustomFennec.pod
 lib/Fennec/Recipe/CustomRunner.pod

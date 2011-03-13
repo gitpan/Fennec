@@ -13,7 +13,7 @@ name: Fennec
 provides:
   Fennec:
     file: lib/Fennec.pm
-    version: 1.004
+    version: 1.005
   Fennec::Listener:
     file: lib/Fennec/Listener.pm
   Fennec::Listener::TB:
@@ -22,6 +22,8 @@ provides:
     file: lib/Fennec/Listener/TB2.pm
   Fennec::Listener::TB::Handle:
     file: lib/Fennec/Listener/TB/Handle.pm
+  Fennec::Listener::TBWin32:
+    file: lib/Fennec/Listener/TBWin32.pm
   Fennec::Meta:
     file: lib/Fennec/Meta.pm
   Fennec::Runner:
@@ -54,4 +56,4 @@ resources:
   homepage: http://open-exodus.net/projects/Fennec
   license: http://dev.perl.org/licenses/
   repository: http://github.com/exodist/Fennec
-version: 1.004
+version: 1.005
