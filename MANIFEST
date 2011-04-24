@@ -32,3 +32,4 @@ t/Self-Running.t
 t/Test-Class.t
 t/Workflow.t
 t/Workflow_Fennec.t
+META.json

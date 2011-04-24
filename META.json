@@ -1,0 +1,113 @@
+{
+   "abstract" : "A test helper providing RSPEC, Workflows, Parallelization, and Encapsulation.",
+   "author" : [
+      "Chad Granum <exodist7@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Fennec",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Exporter::Declare" : 0,
+            "List::Util" : 0,
+            "Mock::Quick" : "1.000",
+            "Parallel::Runner" : "0.010",
+            "Scalar::Util" : 0,
+            "TAP::Parser" : 0,
+            "Test::Exception" : "0.29",
+            "Test::Simple" : "0.88",
+            "Test::Warn" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Fennec" : {
+         "file" : "lib/Fennec.pm",
+         "version" : "1.007"
+      },
+      "Fennec::Finder" : {
+         "file" : "lib/Fennec/Finder.pm",
+         "version" : 0
+      },
+      "Fennec::Listener" : {
+         "file" : "lib/Fennec/Listener.pm",
+         "version" : 0
+      },
+      "Fennec::Listener::TB" : {
+         "file" : "lib/Fennec/Listener/TB.pm",
+         "version" : 0
+      },
+      "Fennec::Listener::TB2" : {
+         "file" : "lib/Fennec/Listener/TB2.pm",
+         "version" : 0
+      },
+      "Fennec::Listener::TB::Handle" : {
+         "file" : "lib/Fennec/Listener/TB/Handle.pm",
+         "version" : 0
+      },
+      "Fennec::Listener::TBWin32" : {
+         "file" : "lib/Fennec/Listener/TBWin32.pm",
+         "version" : 0
+      },
+      "Fennec::Meta" : {
+         "file" : "lib/Fennec/Meta.pm",
+         "version" : 0
+      },
+      "Fennec::Runner" : {
+         "file" : "lib/Fennec/Runner.pm",
+         "version" : 0
+      },
+      "Fennec::Util" : {
+         "file" : "lib/Fennec/Util.pm",
+         "version" : 0
+      },
+      "Test::Workflow" : {
+         "file" : "lib/Test/Workflow.pm",
+         "version" : 0
+      },
+      "Test::Workflow::Block" : {
+         "file" : "lib/Test/Workflow/Block.pm",
+         "version" : 0
+      },
+      "Test::Workflow::Layer" : {
+         "file" : "lib/Test/Workflow/Layer.pm",
+         "version" : 0
+      },
+      "Test::Workflow::Meta" : {
+         "file" : "lib/Test/Workflow/Meta.pm",
+         "version" : 0
+      },
+      "Test::Workflow::Test" : {
+         "file" : "lib/Test/Workflow/Test.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/exodist/Fennec/issues"
+      },
+      "homepage" : "http://open-exodus.net/projects/Fennec",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/exodist/Fennec"
+      }
+   },
+   "version" : "1.007"
+}
