@@ -2,6 +2,7 @@ Build.PL
 CHANGES
 GOALS
 lib/Fennec.pm
+lib/Fennec/Finder.pm
 lib/Fennec/Listener.pm
 lib/Fennec/Listener/TB.pm
 lib/Fennec/Listener/TB/Handle.pm
@@ -21,7 +22,9 @@ MANIFEST			This list of files
 META.yml
 README
 t/CantFindLayer.t
+t/Finder.t
 t/import_skip.t
+t/lib/FinderTest.pm
 t/lib/WorkflowTest.pm
 t/Mock.t
 t/POD.t

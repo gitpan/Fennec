@@ -13,7 +13,9 @@ name: Fennec
 provides:
   Fennec:
     file: lib/Fennec.pm
-    version: 1.005
+    version: 1.006
+  Fennec::Finder:
+    file: lib/Fennec/Finder.pm
   Fennec::Listener:
     file: lib/Fennec/Listener.pm
   Fennec::Listener::TB:
@@ -56,4 +58,4 @@ resources:
   homepage: http://open-exodus.net/projects/Fennec
   license: http://dev.perl.org/licenses/
   repository: http://github.com/exodist/Fennec
-version: 1.005
+version: 1.006
