@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build: 0.38
 dynamic_config: 1
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110930'
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,7 +15,7 @@ name: Fennec
 provides:
   Fennec:
     file: lib/Fennec.pm
-    version: 1.008
+    version: 1.009
   Fennec::Finder:
     file: lib/Fennec/Finder.pm
     version: 0
@@ -30,6 +30,9 @@ provides:
     version: 0
   Fennec::Listener::TB::Handle:
     file: lib/Fennec/Listener/TB/Handle.pm
+    version: 0
+  Fennec::Listener::TB::Result:
+    file: lib/Fennec/Listener/TB/Result.pm
     version: 0
   Fennec::Listener::TBWin32:
     file: lib/Fennec/Listener/TBWin32.pm
@@ -74,4 +77,4 @@ resources:
   homepage: http://open-exodus.net/projects/Fennec
   license: http://dev.perl.org/licenses/
   repository: http://github.com/exodist/Fennec
-version: 1.008
+version: 1.009
