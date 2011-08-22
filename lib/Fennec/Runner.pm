@@ -129,6 +129,7 @@ sub run {
         print "Running: $class\n";
         my $instance = $class->can('new') ? $class->new : bless( {}, $class );
         my $meta = $instance->TEST_WORKFLOW;
+        $meta->debug_long_running( $instance->FENNEC->debug_long_running );
 
         my $prunner;
         if ( my $max = $class->FENNEC->parallel ) {
@@ -137,10 +138,34 @@ sub run {
             }
             else {
                 require Parallel::Runner;
-                $prunner = Parallel::Runner->new( $max );
+                $prunner = Parallel::Runner->new( $max, pipe => 1 );
+                $prunner->reap_callback( sub {
+                    my ( $status, $pid, $pid_again, $proc ) = @_;
+
+                    while( my $data = eval { $proc->read() }) {
+                        $self->listener->process( $data );
+                    }
+
+                    $self->listener->flush( $pid );
+
+                    # Status as returned from system, so 0 is good, 1+ is bad.
+                    $self->exception( "Child process did not exit cleanly", "Status: $status" )
+                        if $status;
+                });
+                $prunner->iteration_callback( sub {
+                    my $runner = shift;
+                    for my $proc ( $runner->children ) {
+                        while( my $data = eval { $proc->read() }) {
+                            $self->listener->process( $data );
+                        }
+                    }
+                });
+
                 $meta->test_run( sub {
-                    my $sub = shift;
+                    my ( $sub, $test, $obj ) = shift;
                     $prunner->run( sub {
+                        my ($parent) = @_;
+                        $self->listener->setup_child( $parent->write_handle ) if $parent;
                         $instance->TEST_WORKFLOW->test_run(undef);
                         $sub->();
                     });

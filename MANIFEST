@@ -5,6 +5,7 @@ lib/Fennec.pm
 lib/Fennec/Finder.pm
 lib/Fennec/Listener.pm
 lib/Fennec/Listener/TB.pm
+lib/Fennec/Listener/TB/Collector.pm
 lib/Fennec/Listener/TB/Handle.pm
 lib/Fennec/Listener/TB/Result.pm
 lib/Fennec/Listener/TB2.pm

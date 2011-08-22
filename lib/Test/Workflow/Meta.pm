@@ -9,7 +9,7 @@ use Fennec::Util qw/accessors/;
 
 accessors qw/
     test_class build_complete root_layer test_run test_sort
-    ok diag skip todo_start todo_end
+    ok diag skip todo_start todo_end debug_long_running
 /;
 
 sub new {
@@ -17,7 +17,6 @@ sub new {
     my ( $test_class ) = @_;
 
     my $tb = "tb";
-    #$tb = "tb2" if eval { require Test::Builder2; 1 };
 
     my $self = bless({
         test_class => $test_class,
