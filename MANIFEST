@@ -25,12 +25,15 @@ META.json
 META.yml
 README
 t/CantFindLayer.t
+t/Case-Scoping.t
 t/Finder.t
 t/import_skip.t
 t/lib/FinderTest.pm
 t/lib/WorkflowTest.pm
 t/Mock.t
+t/order.t
 t/POD.t
+t/procs.t
 t/Self-Running.t
 t/Test-Class.t
 t/Workflow.t

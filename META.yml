@@ -4,9 +4,9 @@ author:
   - 'Chad Granum <exodist7@gmail.com>'
 build_requires: {}
 configure_requires:
-  Module::Build: 0.38
+  Module::Build: 0.40
 dynamic_config: 1
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,7 +15,7 @@ name: Fennec
 provides:
   Fennec:
     file: lib/Fennec.pm
-    version: 1.012
+    version: 1.013
   Fennec::Finder:
     file: lib/Fennec/Finder.pm
     version: 0
@@ -69,7 +69,7 @@ requires:
   Exporter::Declare: 0
   List::Util: 0
   Mock::Quick: 1.000
-  Parallel::Runner: 0.011
+  Parallel::Runner: 0.013
   Scalar::Util: 0
   TAP::Parser: 0
   Test::Exception: 0.29
@@ -80,4 +80,4 @@ resources:
   homepage: http://open-exodus.net/projects/Fennec
   license: http://dev.perl.org/licenses/
   repository: http://github.com/exodist/Fennec
-version: 1.012
+version: 1.013
