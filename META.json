@@ -37,7 +37,7 @@
    "provides" : {
       "Fennec" : {
          "file" : "lib/Fennec.pm",
-         "version" : "1.013"
+         "version" : "1.014"
       },
       "Fennec::Finder" : {
          "file" : "lib/Fennec/Finder.pm",
@@ -117,5 +117,5 @@
          "url" : "http://github.com/exodist/Fennec"
       }
    },
-   "version" : "1.013"
+   "version" : "1.014"
 }
