@@ -1,5 +1,5 @@
 {
-   "abstract" : "A test helper providing RSPEC, Workflows, Parallelization, and Encapsulation.",
+   "abstract" : "A testers toolbox, and best friend",
    "author" : [
       "Chad Granum <exodist7@gmail.com>"
    ],
@@ -20,6 +20,9 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Fennec::Declare" : "1.001"
+         },
          "requires" : {
             "Carp" : "0",
             "Exporter::Declare" : "0",
@@ -27,7 +30,6 @@
             "Mock::Quick" : "1.000",
             "Parallel::Runner" : "0.013",
             "Scalar::Util" : "0",
-            "TAP::Parser" : "0",
             "Test::Exception" : "0.29",
             "Test::Simple" : "0.88",
             "Test::Warn" : "0"
@@ -37,38 +39,26 @@
    "provides" : {
       "Fennec" : {
          "file" : "lib/Fennec.pm",
-         "version" : "1.015"
+         "version" : "2.000_001"
+      },
+      "Fennec::Collector" : {
+         "file" : "lib/Fennec/Collector.pm",
+         "version" : 0
+      },
+      "Fennec::Collector::TB" : {
+         "file" : "lib/Fennec/Collector/TB.pm",
+         "version" : 0
+      },
+      "Fennec::Collector::TB::TempFiles" : {
+         "file" : "lib/Fennec/Collector/TB/TempFiles.pm",
+         "version" : 0
+      },
+      "Fennec::EndRunner" : {
+         "file" : "lib/Fennec/EndRunner.pm",
+         "version" : 0
       },
       "Fennec::Finder" : {
          "file" : "lib/Fennec/Finder.pm",
-         "version" : 0
-      },
-      "Fennec::Listener" : {
-         "file" : "lib/Fennec/Listener.pm",
-         "version" : 0
-      },
-      "Fennec::Listener::TB" : {
-         "file" : "lib/Fennec/Listener/TB.pm",
-         "version" : 0
-      },
-      "Fennec::Listener::TB2" : {
-         "file" : "lib/Fennec/Listener/TB2.pm",
-         "version" : 0
-      },
-      "Fennec::Listener::TB::Collector" : {
-         "file" : "lib/Fennec/Listener/TB/Collector.pm",
-         "version" : 0
-      },
-      "Fennec::Listener::TB::Handle" : {
-         "file" : "lib/Fennec/Listener/TB/Handle.pm",
-         "version" : 0
-      },
-      "Fennec::Listener::TB::Result" : {
-         "file" : "lib/Fennec/Listener/TB/Result.pm",
-         "version" : 0
-      },
-      "Fennec::Listener::TBWin32" : {
-         "file" : "lib/Fennec/Listener/TBWin32.pm",
          "version" : 0
       },
       "Fennec::Meta" : {
@@ -77,6 +67,10 @@
       },
       "Fennec::Runner" : {
          "file" : "lib/Fennec/Runner.pm",
+         "version" : 0
+      },
+      "Fennec::Test" : {
+         "file" : "lib/Fennec/Test.pm",
          "version" : 0
       },
       "Fennec::Util" : {
@@ -104,7 +98,7 @@
          "version" : 0
       }
    },
-   "release_status" : "stable",
+   "release_status" : "testing",
    "resources" : {
       "bugtracker" : {
          "web" : "http://github.com/exodist/Fennec/issues"
@@ -117,5 +111,5 @@
          "url" : "http://github.com/exodist/Fennec"
       }
    },
-   "version" : "1.015"
+   "version" : "2.000_001"
 }
