@@ -15,7 +15,7 @@ name: Fennec
 provides:
   Fennec:
     file: lib/Fennec.pm
-    version: 2.001
+    version: 2.002
   Fennec::Collector:
     file: lib/Fennec/Collector.pm
     version: 0
@@ -72,7 +72,7 @@ requires:
   Test::Warn: 0
 resources:
   bugtracker: http://github.com/exodist/Fennec/issues
-  homepage: http://open-exodus.net/projects/Fennec
+  homepage: http://exodist.github.io/Fennec/
   license: http://dev.perl.org/licenses/
   repository: http://github.com/exodist/Fennec
-version: 2.001
+version: 2.002

@@ -7,7 +7,7 @@ lib/Fennec/Collector/TB.pm
 lib/Fennec/Collector/TB/TempFiles.pm
 lib/Fennec/EndRunner.pm
 lib/Fennec/Finder.pm
-lib/Fennec/Manual.pm
+lib/Fennec/Manual.pod
 lib/Fennec/Manual/CustomFennec.pod
 lib/Fennec/Meta.pm
 lib/Fennec/Runner.pm
