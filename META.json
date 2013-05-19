@@ -39,7 +39,7 @@
    "provides" : {
       "Fennec" : {
          "file" : "lib/Fennec.pm",
-         "version" : "2.000_001"
+         "version" : "2.000"
       },
       "Fennec::Collector" : {
          "file" : "lib/Fennec/Collector.pm",
@@ -98,7 +98,7 @@
          "version" : 0
       }
    },
-   "release_status" : "testing",
+   "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "web" : "http://github.com/exodist/Fennec/issues"
@@ -111,5 +111,5 @@
          "url" : "http://github.com/exodist/Fennec"
       }
    },
-   "version" : "2.000_001"
+   "version" : "2.000"
 }
