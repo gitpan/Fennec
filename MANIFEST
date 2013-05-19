@@ -25,6 +25,7 @@ README
 t/CantFindLayer.t
 t/Case-Scoping.t
 t/Child.t
+t/Class.t
 t/Declare.t
 t/FennecLN/CantFindLayer.ft
 t/FennecLN/Case-Scoping.ft
