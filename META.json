@@ -39,7 +39,7 @@
    "provides" : {
       "Fennec" : {
          "file" : "lib/Fennec.pm",
-         "version" : "2.003"
+         "version" : "2.004"
       },
       "Fennec::Collector" : {
          "file" : "lib/Fennec/Collector.pm",
@@ -111,5 +111,5 @@
          "url" : "http://github.com/exodist/Fennec"
       }
    },
-   "version" : "2.003"
+   "version" : "2.004"
 }
