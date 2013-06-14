@@ -15,7 +15,7 @@ name: Fennec
 provides:
   Fennec:
     file: lib/Fennec.pm
-    version: 2.008
+    version: 2.009
   Fennec::Collector:
     file: lib/Fennec/Collector.pm
     version: 0
@@ -64,7 +64,7 @@ requires:
   Carp: 0
   Exporter::Declare: 0
   List::Util: 0
-  Mock::Quick: 1.000
+  Mock::Quick: 1.106
   Parallel::Runner: 0.013
   Scalar::Util: 0
   Test::Exception: 0.29
@@ -75,4 +75,4 @@ resources:
   homepage: http://exodist.github.io/Fennec/
   license: http://dev.perl.org/licenses/
   repository: http://github.com/exodist/Fennec
-version: 2.008
+version: 2.009
