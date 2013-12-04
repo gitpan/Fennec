@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build: 0.40
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.131560'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,49 +15,35 @@ name: Fennec
 provides:
   Fennec:
     file: lib/Fennec.pm
-    version: 2.010
+    version: 2.011
   Fennec::Collector:
     file: lib/Fennec/Collector.pm
-    version: 0
   Fennec::Collector::TB:
     file: lib/Fennec/Collector/TB.pm
-    version: 0
   Fennec::Collector::TB::TempFiles:
     file: lib/Fennec/Collector/TB/TempFiles.pm
-    version: 0
   Fennec::EndRunner:
     file: lib/Fennec/EndRunner.pm
-    version: 0
   Fennec::Finder:
     file: lib/Fennec/Finder.pm
-    version: 0
   Fennec::Meta:
     file: lib/Fennec/Meta.pm
-    version: 0
   Fennec::Runner:
     file: lib/Fennec/Runner.pm
-    version: 0
   Fennec::Test:
     file: lib/Fennec/Test.pm
-    version: 0
   Fennec::Util:
     file: lib/Fennec/Util.pm
-    version: 0
   Test::Workflow:
     file: lib/Test/Workflow.pm
-    version: 0
   Test::Workflow::Block:
     file: lib/Test/Workflow/Block.pm
-    version: 0
   Test::Workflow::Layer:
     file: lib/Test/Workflow/Layer.pm
-    version: 0
   Test::Workflow::Meta:
     file: lib/Test/Workflow/Meta.pm
-    version: 0
   Test::Workflow::Test:
     file: lib/Test/Workflow/Test.pm
-    version: 0
 recommends:
   Fennec::Declare: 1.001
 requires:
@@ -75,4 +61,4 @@ resources:
   homepage: http://exodist.github.io/Fennec/
   license: http://dev.perl.org/licenses/
   repository: http://github.com/exodist/Fennec
-version: 2.010
+version: 2.011
