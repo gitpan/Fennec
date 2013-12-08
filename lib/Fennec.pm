@@ -7,7 +7,7 @@ BEGIN { require Fennec::Runner }
 use Fennec::Test;
 use Fennec::Util qw/inject_sub require_module verbose_message/;
 use Carp qw/croak carp/;
-our $VERSION = '2.011';
+our $VERSION = '2.012';
 
 sub defaults {
     (
@@ -460,7 +460,7 @@ checking if the pid changed, and making sure you exit the child process.
 
 =item Mock::Quick - Mocking without the eye gouging
 
-L<Mock::Quick> is a mocking library that makes mocking easy. In additon it uses
+L<Mock::Quick> is a mocking library that makes mocking easy. In addition it uses
 a declarative style interface. Unlike most other mocking libraries on CPAN, it
 does not make people want to gouge their eyes out and curl up in the fetal
 position.
@@ -676,9 +676,16 @@ Used to run a set of tests against multiple conditions
 
 Setup, run once before any tests in the describe scope run.
 
+=item before_case $name => sub { ... };
+
+Setup, run before any case blocks are run.
+
 =item before_each $name => sub { ... };
 
-Setup, run once per test, just before it runs.
+=item after_case $name => sub { ... };
+
+Setup, run once per test, just before it runs. Both run after the case block
+(if there is one).
 
 =item around_each $name => sub { ... };
 
@@ -1189,7 +1196,7 @@ You can also create a custom runner using a single .t file to run all your
 Fennec tests. This has caveats though, such as not knowing which test file had
 problems without checking the failure messages.
 
-This will find all *.ft and/or *.pm moduls under the t/ directory. It will load
+This will find all *.ft and/or *.pm modules under the t/ directory. It will load
 and run any found. These will be run in parallel
 
 t/runner.t

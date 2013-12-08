@@ -22,6 +22,9 @@ MANIFEST			This list of files
 META.json
 META.yml
 README
+start_server.sh
+t/around_all.t
+t/before_case.t
 t/CantFindLayer.t
 t/Case-Scoping.t
 t/Child.t
