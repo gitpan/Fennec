@@ -4,7 +4,7 @@
       "Chad Granum <exodist7@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.131560",
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "perl_5"
    ],
@@ -39,49 +39,63 @@
    "provides" : {
       "Fennec" : {
          "file" : "lib/Fennec.pm",
-         "version" : "2.012"
+         "version" : "2.013"
       },
       "Fennec::Collector" : {
-         "file" : "lib/Fennec/Collector.pm"
+         "file" : "lib/Fennec/Collector.pm",
+         "version" : 0
       },
       "Fennec::Collector::TB" : {
-         "file" : "lib/Fennec/Collector/TB.pm"
+         "file" : "lib/Fennec/Collector/TB.pm",
+         "version" : 0
       },
       "Fennec::Collector::TB::TempFiles" : {
-         "file" : "lib/Fennec/Collector/TB/TempFiles.pm"
+         "file" : "lib/Fennec/Collector/TB/TempFiles.pm",
+         "version" : 0
       },
       "Fennec::EndRunner" : {
-         "file" : "lib/Fennec/EndRunner.pm"
+         "file" : "lib/Fennec/EndRunner.pm",
+         "version" : 0
       },
       "Fennec::Finder" : {
-         "file" : "lib/Fennec/Finder.pm"
+         "file" : "lib/Fennec/Finder.pm",
+         "version" : 0
       },
       "Fennec::Meta" : {
-         "file" : "lib/Fennec/Meta.pm"
+         "file" : "lib/Fennec/Meta.pm",
+         "version" : 0
       },
       "Fennec::Runner" : {
-         "file" : "lib/Fennec/Runner.pm"
+         "file" : "lib/Fennec/Runner.pm",
+         "version" : 0
       },
       "Fennec::Test" : {
-         "file" : "lib/Fennec/Test.pm"
+         "file" : "lib/Fennec/Test.pm",
+         "version" : 0
       },
       "Fennec::Util" : {
-         "file" : "lib/Fennec/Util.pm"
+         "file" : "lib/Fennec/Util.pm",
+         "version" : 0
       },
       "Test::Workflow" : {
-         "file" : "lib/Test/Workflow.pm"
+         "file" : "lib/Test/Workflow.pm",
+         "version" : 0
       },
       "Test::Workflow::Block" : {
-         "file" : "lib/Test/Workflow/Block.pm"
+         "file" : "lib/Test/Workflow/Block.pm",
+         "version" : 0
       },
       "Test::Workflow::Layer" : {
-         "file" : "lib/Test/Workflow/Layer.pm"
+         "file" : "lib/Test/Workflow/Layer.pm",
+         "version" : 0
       },
       "Test::Workflow::Meta" : {
-         "file" : "lib/Test/Workflow/Meta.pm"
+         "file" : "lib/Test/Workflow/Meta.pm",
+         "version" : 0
       },
       "Test::Workflow::Test" : {
-         "file" : "lib/Test/Workflow/Test.pm"
+         "file" : "lib/Test/Workflow/Test.pm",
+         "version" : 0
       }
    },
    "release_status" : "stable",
@@ -97,5 +111,5 @@
          "url" : "http://github.com/exodist/Fennec"
       }
    },
-   "version" : "2.012"
+   "version" : "2.013"
 }
