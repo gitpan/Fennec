@@ -15,7 +15,7 @@ name: Fennec
 provides:
   Fennec:
     file: lib/Fennec.pm
-    version: 2.016
+    version: 2.017
   Fennec::Collector:
     file: lib/Fennec/Collector.pm
     version: 0
@@ -62,6 +62,7 @@ recommends:
   Fennec::Declare: 1.001
 requires:
   Carp: 0
+  Child: 0.010
   Exporter::Declare: 0
   List::Util: 0
   Mock::Quick: 1.106
@@ -75,4 +76,4 @@ resources:
   homepage: http://exodist.github.io/Fennec/
   license: http://dev.perl.org/licenses/
   repository: http://github.com/exodist/Fennec
-version: 2.016
+version: 2.017

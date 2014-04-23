@@ -16,6 +16,7 @@ BEGIN {
     srand($seed);
 }
 
+use Cwd qw/abs_path/;
 use Carp qw/carp croak confess/;
 use List::Util qw/shuffle/;
 use Scalar::Util qw/blessed/;
@@ -188,6 +189,7 @@ sub run_test_class {
     my $ptests   = $self->prunner( $class->FENNEC->parallel );
     my $pforce   = $class->FENNEC->parallel ? 1 : 0;
     my $meta     = $instance->TEST_WORKFLOW;
+    my $orig_cwd = abs_path;
 
     $meta->test_wait( sub { $ptests->finish } );
     $meta->test_run(
@@ -195,6 +197,8 @@ sub run_test_class {
             my ($run) = @_;
             $ptests->run(
                 sub {
+                    chdir $orig_cwd;
+                    local %ENV = %ENV;
                     $run->();
                     $self->collector->end_pid();
                 },
@@ -229,11 +233,6 @@ sub DESTROY {
 #
 # This usually means you ran a Fennec test file directly with prove or perl,
 # but the file does not call done_testing at the end.
-#
-# This is new behavior as of Fennec 2.000. Old versions used a couple of evil
-# hacks to make it work without calling done_testing. These resulted in things
-# such as broken coverage tests, broken Win32 (who cares right?), and other
-# strange and hard to debug behavior.
 #
 # Fennec Tests loaded, but not run:
 $tests

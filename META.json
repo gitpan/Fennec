@@ -25,6 +25,7 @@
          },
          "requires" : {
             "Carp" : "0",
+            "Child" : "0.010",
             "Exporter::Declare" : "0",
             "List::Util" : "0",
             "Mock::Quick" : "1.106",
@@ -39,7 +40,7 @@
    "provides" : {
       "Fennec" : {
          "file" : "lib/Fennec.pm",
-         "version" : "2.016"
+         "version" : "2.017"
       },
       "Fennec::Collector" : {
          "file" : "lib/Fennec/Collector.pm"
@@ -97,5 +98,5 @@
          "url" : "http://github.com/exodist/Fennec"
       }
    },
-   "version" : "2.016"
+   "version" : "2.017"
 }

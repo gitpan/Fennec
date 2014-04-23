@@ -55,6 +55,7 @@ t/RunSpecific.t
 t/Self-Running-Legacy.t
 t/Self-Running.t
 t/subclass.t
+t/Test-Isolation.t
 t/Todo.t
 t/Workflow.t
 t/Workflow_Fennec.t
